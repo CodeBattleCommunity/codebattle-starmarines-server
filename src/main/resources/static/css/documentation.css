@@ -1,0 +1,29 @@
+/* 
+    Document   : documentation
+    Created on : Nov 1, 2012, 3:08:38 PM
+    Author     : Sergey_Fedorov
+    Description:
+        Purpose of the stylesheet follows.
+*/
+root {
+	display: block;
+}
+
+#info-container {
+	margin-top: 30px;
+	word-wrap: break-word;
+	padding: 5px 20px 20px 20px;
+}
+
+pre.code {
+	white-space: pre-wrap;
+	font: 10pt/9pt monospace;
+	margin: 30px 0 30px 0;
+	padding: 10px;
+	color: #FEC;
+	border-left: 4px solid #222;
+}
+
+h3 {
+    color:#FEC;
+}

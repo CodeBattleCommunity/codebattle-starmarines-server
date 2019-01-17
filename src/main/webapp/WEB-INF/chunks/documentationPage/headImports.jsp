@@ -1,0 +1,2 @@
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/documentation.css" />
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/information.css" />

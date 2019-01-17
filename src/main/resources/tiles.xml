@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "classpath:/WEB-INF/tiles-config_2_0.dtd"
+        >
+<tiles-definitions>
+
+    <definition name="aPage">
+        <put-attribute name="header" value="" />
+        <put-attribute name="footer" value="/WEB-INF/chunks/common/footer.jsp" />
+        <put-attribute name="commonHeadImports" value=""/>
+        <put-attribute name="currentHeadImports" value = ""/>
+        <put-attribute name="title" value="" />
+    </definition>
+       
+    <definition name="outerPage" extends="aPage" template="/WEB-INF/chunks/templates/outerPageLayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/chunks/common/outerHeader.jsp" />
+        <put-attribute name="commonHeadImports" value="/WEB-INF/chunks/common/outerHeadImports.jsp"/>
+        <put-attribute name="tournamentCountdown" value="/WEB-INF/chunks/common/countdown.jsp"/>
+        <put-attribute name="content" value="" />
+    </definition>
+    
+    <definition name="innerPage" extends="aPage" template="/WEB-INF/chunks/templates/innerPageLayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/chunks/common/innerHeader.jsp" />
+        <put-attribute name="commonHeadImports" value="/WEB-INF/chunks/common/innerHeadImports.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/chunks/common/menu.jsp"/>
+        <put-attribute name="content" value="" />
+    </definition>
+
+    <definition name="errorPage" extends="aPage" template="/WEB-INF/chunks/templates/errorPageLayout.jsp">
+        <put-attribute name="header" value="/WEB-INF/chunks/common/innerHeader.jsp" />
+        <put-attribute name="commonHeadImports" value="/WEB-INF/chunks/common/innerHeadImports.jsp"/>
+        <put-attribute name="content" value="" />
+    </definition>
+    
+    <definition name="login" extends="outerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/welcomePage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/welcomePage/page.jsp" />
+    </definition>
+    
+    <definition name="info" extends="outerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : История"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/infoPage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/infoPage/page.jsp" />
+    </definition>
+    
+    <definition name="signUp" extends="outerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : Регистрация"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/registrationPage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/registrationPage/page.jsp" />
+    </definition>
+    
+    <definition name="profile" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : Профиль игрока"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/profilePage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/profilePage/page.jsp" />
+    </definition>
+    
+    <definition name="documentation" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : Документация"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/documentationPage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/documentationPage/page.jsp" />
+    </definition>
+    
+    <definition name="training" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : Тренировка"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/trainingPage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/trainingPage/page.jsp" />
+    </definition>
+    
+    <definition name="battle" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : Сражение"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/battlePage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/battlePage/page.jsp" />
+    </definition>
+    
+    <definition name="gameControl" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : Упарвление игрой"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/gameControl/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/gameControl/page.jsp" />
+    </definition>
+
+    <definition name="createGame" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : Создание новой игры"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/createGamePage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/createGamePage/page.jsp" />
+    </definition>
+
+    <definition name="godPage" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES : гадпейдж"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/godPage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/godPage/page.jsp" />
+    </definition>
+    
+
+    <definition name="noCookie" extends="outerPage">
+        <put-attribute name="title" value="No cookies"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/noCookiePage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/noCookiePage/page.jsp" />
+    </definition>
+
+    <definition name="systemError" extends="errorPage">
+        <put-attribute name="title" value="HARDCODED EXCEPTION"/>
+        <put-attribute name="content" value="/WEB-INF/chunks/simple/errorPage.jsp" />
+    </definition>
+
+    <definition name="notFound" extends="errorPage">
+        <put-attribute name="title" value="NOT FOUND"/>
+        <put-attribute name="content" value="/WEB-INF/chunks/simple/notFound.jsp" />
+    </definition>
+
+    <definition name="forbidden" extends="errorPage">
+        <put-attribute name="title" value="IT IS FORBIDDEN"/>
+        <put-attribute name="content" value="/WEB-INF/chunks/simple/forbidden.jsp" />
+    </definition>
+
+    <definition name="gamesStatistics" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES: Статистика"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/gamesStatistics/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/gamesStatistics/page.jsp" />
+    </definition>
+
+    <definition name="gameBroadcast" extends="innerPage">
+        <put-attribute name="title" value="HARDCODED STARMARINES: Трансляция игры"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/chunks/broadcastPage/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/chunks/broadcastPage/page.jsp" />
+    </definition>
+
+    <definition name="gameTable" template="/WEB-INF/chunks/ajax/showGameTable.jsp">
+    </definition>
+
+    <definition name="gameListAsync" template="/WEB-INF/chunks/ajax/gameList.jsp">
+    </definition>
+
+    <definition name="checkGame" template="/WEB-INF/chunks/ajax/checkGame.jsp">
+    </definition>
+
+    <definition name="verifyPage" template="/WEB-INF/chunks/templates/emptyPageLayout.jsp">
+        <put-attribute name="content" value="/WEB-INF/chunks/verifyPage/b6114a316be6.jsp" />
+    </definition>
+
+</tiles-definitions>

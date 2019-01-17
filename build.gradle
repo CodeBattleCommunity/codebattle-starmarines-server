@@ -1,0 +1,51 @@
+buildscript {
+    ext {
+        springBootVersion = '2.1.1.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.epam.game'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    implementation 'org.springframework.security:spring-security-taglibs'
+
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'org.apache.tiles:tiles-jsp:3.0.8'
+    compile group: 'javax.servlet', name: 'jstl', version: '1.2'
+    implementation 'org.apache.tiles:tiles-core:3.0.8'
+    implementation 'org.apache.tiles:tiles-servlet:3.0.8'
+    implementation 'org.apache.tiles:tiles-request-api:1.0.6'
+    implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+
+    compile 'org.projectlombok:lombok:1.16.20'
+
+//    compile 'org.springframework.security:spring-security-config'
+    compile 'org.postgresql:postgresql'
+
+
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

@@ -1,0 +1,1 @@
+<link href='http://fonts.googleapis.com/css?family=Play:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>

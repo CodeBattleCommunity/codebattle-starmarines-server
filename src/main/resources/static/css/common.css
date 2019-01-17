@@ -1,0 +1,220 @@
+body{
+    /*background: 0px 00px url('cool_epic_space.jpg') #000;*/
+    color: #fff;
+    font: normal 12pt/12pt 'Play', sans-serif;
+    /*margin: 0;*/
+    /*padding: 0;*/
+    /*width: 100%;*/
+    /*height: 100%;*/
+}
+
+/*html {
+    width: 100%;
+    height: 100%;
+}*/
+p{
+    font: normal 12pt/12pt 'Play', sans-serif;
+    text-align: justify;
+    text-indent:40px;
+}
+h1{
+    color: #FFF;
+    font: bold 36pt/0 'Play', sans-serif;
+    padding: 80px 0 120px 0;
+    text-shadow: 0 0 60px #FFF;
+    margin:0;
+}
+h2{
+    color: #FFF;
+    font: bold 18pt/0 'Play', sans-serif;
+    text-indent:40px;
+    padding: 20px 0 40px 0;
+    text-indent:40px;
+}
+h2{
+    color: #FFF;
+    font: bold 16pt/0 'Play', sans-serif;
+    text-indent:40px;
+    padding: 20px 0 40px 0;
+    text-indent:40px;
+}
+a{
+    color:#AAF;
+    text-decoration: none;
+}		
+a:visited{
+    color: #AAF;
+}
+a:hover{
+    color: #AAF;
+    text-decoration: underline;
+}
+
+pre.code {
+    white-space: pre-wrap;
+    font: 10pt/9pt monospace;
+    margin: 30px 0 30px 0;
+    padding: 10px;
+    color: #fff;
+    border-left: 10px solid #666;
+    background-color: #333;
+}
+
+.menu ul{
+    display:block;
+    margin: auto;
+    padding: 0 20px 0 20px;
+    background-color: #333;
+    text-align:center;
+}
+.menu li{
+    background: #666;
+    display:inline-block;
+    text-align:center;
+    padding: 20px 20px 6px 20px;
+}
+.menu li:hover{
+    background: #888;
+}
+.menu li a, .menu li a:visited, .menu li a:hover{
+    color: #FFF;
+    text-decoration:none;
+}
+
+table{
+    border: solid 1px;
+}
+th{
+    text-align:center;
+}
+
+.right-align{
+    text-align:right;
+}
+.left-align{
+    text-align:left;
+}
+.float-right{
+    float:right;
+}
+
+.errors{
+    text-align:right;
+    display:block;
+}
+
+.wrap{
+    max-width:1920px;
+    margin:auto;
+    text-align:center;
+}
+.header{
+
+}
+.content{
+    padding: 30px 44px 70px 44px;
+    text-align:left;
+    background-color: rgba(80, 80, 80, 0.5);
+}
+.content-small-wrapper{
+    margin:100px auto;
+    text-align:center;
+}
+
+.pseudoHidden {
+    display:none;
+}
+
+.row{
+    padding:5px;
+}
+div.content-small-wrapper > div{
+    display:inline-block;
+    text-align:left;
+    padding:30px;
+    background-color:#333;
+}
+.footer{
+    height: 100px;
+    background-color:#333;
+}
+
+login form 
+#loginContainer{
+    width:300px;
+}
+label.login{
+    display:inline-block;
+    width:100px;
+}
+input.login{
+    width:180px;
+}
+
+profile form 
+label.profile{
+    display:inline-block;
+    width:200px;
+}
+
+games list page 
+#gamesList{
+    width:100%;
+}
+
+sign up page 
+#signUpContainer{
+    width:400px;
+}
+label.signUp{
+    display:inline-block;
+    width:200px;
+}
+input.signUp{
+    width:180px;
+}
+.gameStatusMessage{
+    text-align:center;
+    padding: 100px 0 100px 0;
+    display:none;
+}
+
+#container {
+    width: 1024px;
+    height: 600px;
+    margin: auto;
+
+}
+canvas{
+    /*background-image:-webkit-radial-gradient(50% 50%, circle farthest-corner, #0E0000 53%, rgba(66, 0, 0, 0.99) 57%, black 100%);*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #0E0000 53%, rgba(66, 0, 0, 0.99) 57%, #FF7A00 100%);*/
+    /*background-image: -webkit-radial-gradient(25% 50%, circle farthest-corner, black 72%, #C4E7E7 76%, black 100%);*/
+    /*background-image:-webkit-radial-gradient(50% 208%, circle farthest-corner, black 50%, #1E2730 62%, black 90%);*/
+    background-image: -webkit-radial-gradient(60% 50%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);/*gut*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #1E2730 1%, black 25%, #1E2730 32%, rgba(0, 0, 0, 1) 90%);*/
+    background-image: -moz-radial-gradient(60% 50%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);
+    /*background-image: -moz-radial-gradient(50% 50%, circle farthest-corner, #1E2730 1%, black 25%, #1E2730 32%, rgba(0, 0, 0, 1) 90%);*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #0C0C0C 0%, #144945 16%, #B0F5F8 68%)*/
+    /*-webkit-radial-gradient(50% 50%, circle farthest-corner, #0C0C0C 0%, #144945 16%, #B0F5F8 55%, #478C8F 68%, #469CA0 68%)*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #0C0C0C 37%, #144945 49%, #B0F5F8 61%);*/
+    /*background-image:-webkit-radial-gradient(50% 51%, circle farthest-corner, #120D35 0%, black 53%, black 55%, black 62%, rgba(150, 234, 255, 0) 99%);*/
+}
+
+canvas:-webkit-full-screen {
+    background-image: -webkit-radial-gradient(60% 50%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);
+    background-image: -moz-radial-gradient(60% 50%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);
+}
+
+/*#trainingLevelContainer {
+    width:400px;
+}
+label.trainingLevel {
+    display:inline-block;
+    width:200px;
+}*/
+
+/*body > div.wrapper {
+	margin: 0 auto;
+	width: 90%;
+    height: 70%;
+}*/

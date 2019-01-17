@@ -1,0 +1,50 @@
+#profile-form {
+	padding: 36px;
+	float: left;
+	width: 370px;
+	margin-top: 260px;
+	background-position: 80% 10%;
+}
+
+#profile-form:before{	
+	background: url("../img/robot.png") no-repeat scroll 0 0 transparent;
+    content: "";
+    display: block;
+    height: 239px;
+    margin: -274px 0 20px -36px;
+}
+
+#profile-form label {
+	width:140px;
+}
+
+#profile-form input[type='submit'] {
+	width:100px;
+}
+
+#profile-form input {
+	width:220px;
+}
+
+#profile-form a {
+	color: #fff;
+	display:inline-block;
+}
+
+#disclaimer {
+    float: right;
+    margin: 37px 0 0 -201px;
+    padding: 20px;
+    width: 700px;
+}
+
+#right-bar {
+    float: right;
+    margin-top: 260px;
+    width: 500px;
+    padding: 20px;
+}
+
+#email {
+    width: 142px !important;
+}

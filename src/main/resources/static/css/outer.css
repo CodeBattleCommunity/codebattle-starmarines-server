@@ -1,0 +1,33 @@
+body {
+	width: 100%;
+	overflow-x: hidden;
+}
+
+body > div.wrapper {
+	background: url("../img/shuttle.png") no-repeat scroll  407px -35px transparent;
+}
+
+#logo {
+	margin: 58px 0 0 26px;
+    position: absolute;
+}
+
+#countdown {
+	color: #FFFFFF;
+    height: 10px;
+    margin: 0 61px -21px 0;
+    padding-top: 9px;
+    font: normal 10pt "Consolas", monospace;
+}
+
+#countdown {
+	text-align: right;
+}
+
+.outerMessage {
+    margin-top: 210px;
+}
+
+.outerMessage h2 {
+    font-size: 16pt;
+}

@@ -1,0 +1,64 @@
+.left-bar {
+	float:left;
+    margin: 177px 0 0 4%;
+    width: 28%;
+    color: #ddd;
+    padding-bottom: 34px !important;
+}
+
+.right-bar {
+	float: right;
+    margin: 177px 5% 0 0;
+    width: 47%;
+    color: #fff;
+}
+
+.left-bar, .right-bar {
+	padding: 2.5%;
+    margin-top: 210px;
+}
+
+.login-ribbon {
+	padding: 7px;
+	background: #fffffd;
+	margin:30px 0% 0 0;
+}
+
+.login-ribbon > a {
+    font-size: 10pt;
+    font-weight: 600;
+    text-decoration: none;
+	color: #000;
+	margin: 0 10px;
+}
+
+#login-form {
+	position: absolute;	
+	width: 200px;
+	color: #fff;
+	padding:20px;
+	display:none;
+	border: 8px solid rgba(0,0,0,0.4);
+	margin-bottom:10px;
+    border-radius: 20px
+}
+
+#login-form label{
+	width: 60px;
+}
+
+#login-form input{
+	width: 130px;
+}
+
+#login-form .submit{
+	margin-left:64px;
+}
+
+#profits{
+    /*float: right;*/
+    margin-top : -20px;
+    margin-left: 110px;
+    margin-bottom: 1em;
+    border: 0px;
+}

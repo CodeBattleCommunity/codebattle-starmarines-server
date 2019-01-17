@@ -1,0 +1,314 @@
+body {
+    background-color: #000;
+    background-image: url("../img/background_alt.jpg");
+    background-repeat: repeat;
+    margin: 0;
+    padding: 0;
+    font: normal 10pt "Arial", sans-serif;
+}
+
+body > div.wrapper {
+    margin: 0 auto 100px;
+    width: 1024px;
+    position: relative;
+}
+
+a, a:visited {
+    color:#fff;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+h2 {
+    font-size: 12pt;
+    line-height: 16pt;
+}
+
+h3 {
+    font-size: 11pt;
+    line-height: 12pt;
+}
+
+p {
+    margin: 15px 0 0 0;
+    font-size: 10pt;
+    line-height: 11pt;
+}
+
+input {
+    border: 1px solid #222;
+}
+
+input[type="submit"] {
+    background-color: #bbb;
+    margin-right: 5px;
+}
+
+img {
+	border: none;
+}
+
+.logo {
+    /*margin: 10% 0% 0% 1%;*/
+    margin: 4%;
+}
+
+h1, h2, h3,h4, h5, h6 {
+    margin:  0px 0px 0px 0px;
+    padding: 0;
+}
+
+.yellow-header {
+    color: #ff8;
+}
+
+.clear-fix {
+    float: none;
+    clear: both;
+}
+
+.pseudoHidden {
+    display:none;
+}
+
+.black-plated {
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+}
+
+.abys-branded {
+    background-color: #333;
+    background-image: url("../img/abys-gray.png");
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    color: #fff;
+}
+
+.form-row {
+    display:block;
+    margin: 5px 0;
+}
+
+.form-row label {
+    display:inline-block;
+    width: 50%;
+}
+
+.right-align {
+    text-align: right;
+}
+
+.float-right {
+	float: right;
+	display: block;
+}
+
+.center-align {
+    text-align: center;
+}
+
+
+#container {
+    width: 1024px;
+    height: 600px;
+    margin: auto;
+
+}
+
+.errors {
+    display:block;
+    color: #ffd07a;
+}
+
+canvas{
+
+    /*background-color: #FFF;*/
+    /*background-image: url("../img/background.jpg");*/
+    background-repeat: repeat;
+    /*background-image: url("../img/background.jpg");*/
+
+    /*background-image:-webkit-radial-gradient(50% 50%, circle farthest-corner, #0E0000 53%, rgba(66, 0, 0, 0.99) 57%, black 100%);*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #0E0000 53%, rgba(66, 0, 0, 0.99) 57%, #FF7A00 100%);*/
+    /*background-image: -webkit-radial-gradient(25% 50%, circle farthest-corner, black 72%, #C4E7E7 76%, black 100%);*/
+    /*background-image:-webkit-radial-gradient(50% 208%, circle farthest-corner, black 50%, #1E2730 62%, black 90%);*/
+    /*background-image: -o-radial-gradient(58% 54%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);*/
+    /*background-image: -webkit-radial-gradient(58% 54%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);gut*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #1E2730 1%, black 25%, #1E2730 32%, rgba(0, 0, 0, 1) 90%);*/
+    /*background-image: -moz-radial-gradient(58% 54%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);*/
+    /*background-image: -moz-radial-gradient(50% 50%, circle farthest-corner, #1E2730 1%, black 25%, #1E2730 32%, rgba(0, 0, 0, 1) 90%);*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #0C0C0C 0%, #144945 16%, #B0F5F8 68%)*/
+    /*-webkit-radial-gradient(50% 50%, circle farthest-corner, #0C0C0C 0%, #144945 16%, #B0F5F8 55%, #478C8F 68%, #469CA0 68%)*/
+    /*background-image: -webkit-radial-gradient(50% 50%, circle farthest-corner, #0C0C0C 37%, #144945 49%, #B0F5F8 61%);*/
+    /*background-image:-webkit-radial-gradient(50% 51%, circle farthest-corner, #120D35 0%, black 53%, black 55%, black 62%, rgba(150, 234, 255, 0) 99%);*/
+}
+
+canvas:-webkit-full-screen {
+    /*background-color: #FFF;*/
+    /*background-image: url("../img/background.jpg");*/
+    background-repeat: repeat;
+
+    /*background-image: -o-radial-gradient(58% 54%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);*/
+    /*background-image: -webkit-radial-gradient(58% 54%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);*/
+    /*background-image: -moz-radial-gradient(58% 54%, circle farthest-corner, #1E2730 0%, black 50%, #1E2730 62%, rgba(0, 0, 0, 1) 90%);*/
+}
+body {
+    color: #FFF;
+}
+
+#leaveGame {
+
+    display: block;
+    position: relative;
+    z-index: 15;
+    text-align: right;
+    margin-top: 4px;
+
+    margin-right: 8px;
+
+    margin-bottom: -20px;
+    margin-right: 20px;
+}
+
+
+.gameStatusMessage {
+    display: none;
+    text-align: center;
+    position: absolute;
+    z-index: 10;
+    width: 1024px;
+    /*height: 600px;*/
+    padding-top: 3%;
+
+}
+
+.opac-black-container {
+    box-shadow: rgba(255, 255, 255, 0.15) 0px 0px 10px 1px;
+    border-radius: 20px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+}
+
+#winner {
+    display: none;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    z-index: 10;
+}
+
+#winnerName {
+    display: none;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+background-color: rgba(42, 42, 42, 0.7);
+padding: 75px 50px 50px 50px;
+height: 470px;
+
+margin-top: -64px;
+}
+
+
+#footer{
+    border-top: 1px solid #2E2E2E;
+    margin-top: 1.5em;
+    color: grey;
+    padding-top:0.3em;
+    top: 30px;
+    position: relative;
+    z-index: -1;
+}
+
+#footer *{
+	vertical-align: middle;
+}
+
+#vk-link img {
+    margin: 0px 10px 0 20px;
+}
+
+#vk-link, #vk-link:visited, #vk-link:hover {
+    color: grey;
+}
+
+#copy {
+	margin: 3px 20px 0 0;
+}
+
+.playersTable th{
+    padding: 10px 10px 10px 10px;
+}
+
+.playersTable tr:nth-child(even){
+background-color: rgba(84, 84, 84, 0.4);
+}
+
+.playersTable{
+    border-collapse: collapse;
+    margin: auto;
+}
+
+.playersTable tr td:nth-child(1){
+width:340px;
+}
+
+.playersTable thead {
+    background-color: rgba(0,0,0,0.2);
+}
+
+#beforeStartTable {
+    position: absolute;
+    top: 90px;
+    font-size: 14pt;
+    background-color: rgba(55, 55, 55, 0.6);
+    width: 100%;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 10px 0 25px 0;
+}
+
+#beforeStartTable .ribbon {
+    padding: 5px 30px;
+    margin: 10px 0;
+    background: rgba(0,0,0,0.2);
+}
+
+#beforeStartTable .playersCount {
+    font-size: 9pt;
+}
+
+.abandonMessage {
+    position: absolute;
+    top: 90px;
+    font-size: 14pt;
+    background-color: rgba(55, 55, 55, 0.6);
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    padding: 10px 0 25px 0;
+}
+
+.red-header {
+    /*color: rgba(250, 177, 120, 1);*/
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+}
+
+.red-bold {
+    color:rgb(240,42,0);
+    font-weight: 700;
+}
+
+.blue {
+    color:rgb(0,176,240) !important;
+}
+
+.large {
+ font-size: 11pt;
+}
+
+.bold {
+    font-weight: 700;
+}

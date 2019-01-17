@@ -1,0 +1,41 @@
+.icon-triangle {
+    background: url("../img/icons/tr.png") 0 50% no-repeat;
+    padding-left: 20px;
+}
+
+.icon-dot {
+    background: url("../img/icons/black.png") 0 50% no-repeat;
+    padding-left: 20px;
+}
+
+.icon-abys {
+    background: url("../img/icons/abys-small.png") 0 50% no-repeat;
+  	padding-left: 30px;
+    background-position-y:6px;
+}
+
+.icon-1 {
+    background: url("../img/icons/1.png") 0 50% no-repeat;
+}
+
+.icon-2 {
+    background: url("../img/icons/2.png") 0 50% no-repeat;
+}
+
+.icon-3 {
+    background: url("../img/icons/3.png") 0 50% no-repeat;
+}
+
+.icon-4 {
+    background: url("../img/icons/4.png") 0 50% no-repeat;
+}
+
+.icon-5 {
+    background: url("../img/icons/5.png") 0 50% no-repeat;
+}
+
+.icon-1, .icon-2, .icon-3, .icon-4, .icon-5 {
+    padding-left: 25px;
+
+    min-height:20px;
+}

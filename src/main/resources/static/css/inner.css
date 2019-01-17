@@ -1,0 +1,79 @@
+body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+.header {
+    background: url("../img/starship.png") no-repeat right top transparent;
+    background-size: contain;
+}
+
+#doclink {
+    display: inline-block;
+}
+
+.menu-wrap #countdown {
+    display: inline-block;
+    width: 430px;
+    /*margin: 0 0 0 50px;*/
+    margin: 0 0 0 -5px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.menu-wrap, .header, .wrapper{
+    width: 1024px;
+    margin: auto;
+}
+
+#logo {
+    height: 160px;
+}
+
+.menu {
+    padding: 0 40px;
+    margin: 0;
+    /*display:inline-block;*/
+}
+
+.item {
+    display:inline-block;
+    padding: 8px;
+}
+
+.icon-abys.item {
+	padding-left:35px;
+	background-position: 8px;
+}
+
+.item.active {
+	background-color: #777;
+}
+
+.menu-wrap a, .menu-wrap a:visited {
+    color: #000;
+    text-decoration: none;
+}
+
+.menu-wrap a.active, .menu-wrap a.active:visited {
+	color: #fff;
+}
+
+.menu-ribbon {
+    background: #fff;
+    font-size: 10pt;
+    width: 1024px;
+    margin: auto;
+    border-radius: 3px;
+    box-shadow: rgba(255, 255, 255, 0.3) 0px 0px 10px 3px;
+}
+
+.menu-wrap {
+    margin:auto;
+    color: #000;
+}
+
+.not-available-msg {
+    font-size:18pt;
+}
+

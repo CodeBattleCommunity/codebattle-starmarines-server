@@ -1,0 +1,79 @@
+#training-form {
+	padding: 20px;
+	float: left;
+	width: 330px;
+	margin-top: 250px;
+	background-position: 214px -50px;
+}
+
+#training-form:before {
+    background: url("../img/robot.png") no-repeat scroll 0 0 transparent;
+    content: "";
+    display: block;
+    height: 239px;
+    margin: -258px 0 20px -20px;
+}
+
+#training-form label {
+	width:120px;
+}
+
+#training-form input, #training-form select {
+	width:200px;
+}
+
+#training-form a {
+	color: #fff;
+	display:block;
+	text-align: right;
+}
+
+#training-form .submit {
+    margin-left: 123px;
+    margin-top: 20px;
+    width:120px;
+}
+
+#disclaimer {
+    float: right;
+    margin: 37px 0 0 -201px;
+    padding: 20px;
+    width: 700px;
+}
+
+#right-bar {
+    float: right;
+    margin-top: 124px;
+    width: 600px;
+}
+
+#right-bar ul{
+	margin: 0;
+	padding: 0;
+}
+
+#right-bar ul li{
+	margin: 17px;
+	list-style: none;
+}
+
+#right-bar .token{
+	display:block;
+	color: #f22;
+	font-weight: 600;
+}
+
+.not-available-msg {
+	margin: 50px auto;
+	padding: 30px;
+}
+
+#notStarted, #finished{
+    display: none;
+   /*visibility: hidden;*/
+     font-family: 'Play';
+    font-size: 40px;
+    /*position:absolute;*/
+    /*top:50%;*/
+    z-index: 10;
+}
