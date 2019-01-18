@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Do not forget to cleanup PGDATA dir on making changes
+
+PDATA="/var/lib/postgresql/data/pgdata"
+docker run --name postgres \
+    -e PGDATA="$PDATA" \
+    -v "D:\data\hardcoded-invaders:$PDATA" \
+    -p 5432:5432 \
+    -d \
+    dojo/postgres:10
+
+

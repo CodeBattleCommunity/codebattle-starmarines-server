@@ -1,8 +1,7 @@
 package com.epam.game.gameinfrastructure.requessthandling;
 
 import com.epam.game.domain.User;
-
-import java.net.Socket;
+import org.springframework.web.socket.WebSocketSession;
 
 /**
  * 
@@ -11,16 +10,16 @@ import java.net.Socket;
  */
 public class PeerController {
 
-    private Socket socket;
+    private WebSocketSession socket;
 
     private User user;
 
-    public PeerController(User user, Socket socket) {
+    public PeerController(User user, WebSocketSession socket) {
         this.user = user;
         this.socket = socket;
     }
 
-    public Socket getSocket() {
+    public WebSocketSession getSocket() {
         return socket;
     }
 
