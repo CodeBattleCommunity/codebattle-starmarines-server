@@ -13,10 +13,6 @@ public class GameThread implements Runnable {
         this.turnDelayMs = turnDelayMs;
     }
 
-    public GameInstance getGame() {
-        return game;
-    }
-
     public void run() {
         try {
             game.start();
