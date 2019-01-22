@@ -33,5 +33,6 @@ public class GameThread implements Runnable {
                 e.printStackTrace();
             }
         }
+        System.out.println("Exiting game thread");
     }
 }

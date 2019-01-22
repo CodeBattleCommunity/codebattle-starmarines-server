@@ -2,6 +2,7 @@ package com.epam.game.gamemodel.model.action.impl;
 
 import com.epam.game.domain.User;
 import com.epam.game.exceptions.IllegalCommandException;
+import com.epam.game.gameinfrastructure.commands.client.ClientAction;
 import com.epam.game.gameinfrastructure.requessthandling.PeerController;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
 import com.epam.game.gamemodel.model.GameInstance;
@@ -25,11 +26,11 @@ public class MoveAction extends Action {
 	
 	private Logger log = Logger.getLogger(MoveAction.class.getName());
 	
-	public MoveAction(GameInstance game, Long fromVertexId, Long toVertexId, int howMuchUnits, User player, PeerController pc){
+	public MoveAction(GameInstance game, ClientAction action, User player, PeerController pc){
 		this.game = game;
-		this.from = fromVertexId;
-		this.to = toVertexId;
-		this.unitsCount = howMuchUnits;
+		this.from = action.getFrom();
+		this.to = action.getTo();
+		this.unitsCount = action.getUnitsCount();
 		this.player = player;
 		this.pc = pc;
 	}
