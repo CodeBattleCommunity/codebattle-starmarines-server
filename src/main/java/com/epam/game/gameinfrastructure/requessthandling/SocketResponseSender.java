@@ -11,14 +11,12 @@ import java.util.*;
 
 /**
  * Singleton keeps the map of games and sockets of clients.
- * 
+ *
  * @author Andrey_Eremeev
- * 
+ *
  */
 
 public class SocketResponseSender implements Observer {
-
-    private final Map<GameInstance, Set<PeerController>> clientsPeers;
 
     private Map<User, Set<String>> clientsMessages;
 
@@ -39,30 +37,17 @@ public class SocketResponseSender implements Observer {
 
     /**
      * Binding socket and game
-     * 
+     *
      * @param id
      *            - games id
      * @param socket
      */
     public void addSocketToGame(GameInstance game, PeerController pc) {
-        synchronized (clientsPeers) {
-            if (!clientsPeers.containsKey(game)) {
-                clientsPeers.put(game, new HashSet<PeerController>());
+        synchronized (game) {
+            if (!game.getClientsPeers().containsKey(game)) {
+                game.getClientsPeers().put(game, new HashSet<PeerController>());
             }
-            synchronized (game) {
-                clientsPeers.get(game).add(pc);
-            }
-        }
-    }
-
-    public void removeSocketFromGame(GameInstance game, PeerController pc) {
-        synchronized (clientsPeers) {
-            if (!clientsPeers.containsKey(game)) {
-                return;
-            }
-            synchronized (game) {
-                clientsPeers.get(game).remove(pc);
-            }
+            game.getClientsPeers().get(game).add(pc);
         }
     }
 
@@ -80,7 +65,7 @@ public class SocketResponseSender implements Observer {
     }
 
     public boolean isConnected(GameInstance game, long playerId) {
-        Set<PeerController> peerControllers = clientsPeers.get(game);
+        Set<PeerController> peerControllers = game.getClientsPeers().get(game);
         if (peerControllers != null) {
             for (PeerController controller : peerControllers) {
                 if (playerId == controller.getUser().getId()) {
@@ -98,7 +83,7 @@ public class SocketResponseSender implements Observer {
             Map<Long, Vertex> vertices = (Map<Long, Vertex>) arg;
             GameInstance game = (GameInstance) o;
 
-            Set<PeerController> pcs = clientsPeers.get(game);
+            Set<PeerController> pcs = game.getClientsPeers().get(game);
 
             if (pcs == null) {
                 return;
@@ -124,7 +109,7 @@ public class SocketResponseSender implements Observer {
     }
 
     /**
-     * 
+     *
      * @param id
      *            - games id
      * @param message
@@ -132,26 +117,24 @@ public class SocketResponseSender implements Observer {
      */
     private void sendMessageToAll(GameInstance game, String message) {
         Set<PeerController> peerControllers;
-        synchronized (clientsPeers) {
-            peerControllers = new HashSet<PeerController>(clientsPeers.get(game));
-        }
-        if (peerControllers != null) {
-            for (PeerController pc : peerControllers) {
-                WebSocketSession clientSession = pc.getSocket();
-                try{
-                    sendMessage(clientSession, message);
-                } catch(IOException e) {
-                    clientsPeers.get(game).remove(pc);
+        synchronized (game) {
+            peerControllers = new HashSet<>(game.getClientsPeers().get(game));
+            if (peerControllers != null) {
+                for (PeerController pc : peerControllers) {
+                    WebSocketSession clientSession = pc.getSocket();
+                    try{
+                        sendMessage(clientSession, message);
+                    } catch(IOException e) {
+                        game.getClientsPeers().get(game).remove(pc);
+                    }
                 }
             }
+            game.getClientsPeers().put(game, new HashSet<>() );
         }
-        clientsPeers.put(game, new HashSet<PeerController>() );
     }
 
     private SocketResponseSender() {
-        clientsPeers = new HashMap<GameInstance, Set<PeerController>>();
         clientsMessages = new HashMap<User, Set<String>>();
         commandConverter = new CommandConverter();
-//        new Thread(new SocketReaper(clientsPeers, 3000)).start();
     }
 }
