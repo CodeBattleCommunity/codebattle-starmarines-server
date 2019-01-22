@@ -47,6 +47,7 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         .permitAll()
                     .anyRequest().authenticated()
                 .and()
+                .csrf().disable() // TODO: for testing purposes only -> extract to separate spring profile
 
                 .formLogin()
                     .loginPage("/" + ViewsEnum.LOGIN + ViewsEnum.EXTENSION)
