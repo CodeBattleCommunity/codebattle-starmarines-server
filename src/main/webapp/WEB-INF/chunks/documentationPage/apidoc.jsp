@@ -29,85 +29,115 @@
 <br/>
 <h3>Что и как отправлять на сервер</h3>
 <p>Идентификация игроков происходит по уникальному ключу, который присваивается каждому игроку при регистрации и может быть изменен по желанию игрока (при условии, что в этот момент игрок не участвует ни в одной игре). Узнать или изменить свой ключ можно на странице <a href='<c:url value="/profile.html"></c:url>'>"<spring:message code="label.menu.profile" />".</a></p>
-<p>Запросы на сервер формируются в xml. Для начала игры нужно получить игровое поле, послав пустой список действий:</p>
-<pre class="code">
-&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
-&lt;request&gt;
-	&lt;token&gt;abcdefghij1k2l3m4n5o6pqrstuvwxyz&lt;/token&gt;
-	&lt;actions&gt;
-	&lt;/actions&gt;
-&lt;/request&gt;
-</pre>
+<p>Запросы на сервер формируются в формате JSON. Для начала игры нужно получить игровое поле, послав пустой список действий.</p>
+<p><b>Важно:</b> при установке соединения по вебсокету необходимо отправить в запросе заголовок "token" с уникальным токеном игрока, который можно посмотреть в разделе "Профиль"</p>
 
 <p>Если пользователь не участвует ни в одной игре или игра уже закончена, сервер сразу пришлет ответ с соответствующей ошибкой, например:</p>
-<pre class="code">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-&lt;response&gt;
-	&lt;planets /&gt;
-	&lt;errors&gt;
-		&lt;error&gt;User has not join any game&lt;/error&gt;
-	&lt;/errors&gt;
-&lt;/response&gt;
+<pre class="code">
+{
+  "planets": [],
+  "errors": [
+    "User already connected"
+  ]
+}
 </pre>
 
 <p>Если игра начата, ответом будет описание игрового поля в следующем виде:</p>
 
 <pre class="code">
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
-	&lt;response&gt;
-		&lt;planets&gt;
-			&lt;planet id=&quot;1&quot;&gt;
-				&lt;owner/&gt;
-				&lt;type&gt;TYPE_A&lt;/type&gt;
-				&lt;droids&gt;0&lt;/droids&gt;
-				&lt;neighbours&gt;
-					&lt;neighbour&gt;2&lt;/neighbour&gt;
-					&lt;neighbour&gt;3&lt;/neighbour&gt;
-				&lt;/neighbours&gt;
-			&lt;/planet&gt;
-			&lt;planet id=&quot;2&quot;&gt;
-				&lt;owner&gt;bot&lt;/owner&gt;
-				&lt;type&gt;TYPE_B&lt;/type&gt;
-				&lt;droids&gt;55&lt;/droids&gt;
-				&lt;neighbours&gt;
-					&lt;neighbour&gt;1&lt;/neighbour&gt;
-					&lt;neighbour&gt;3&lt;/neighbour&gt;
-					&lt;neighbour&gt;5&lt;/neighbour&gt;
-					&lt;neighbour&gt;6&lt;/neighbour&gt;
-					&lt;neighbour&gt;7&lt;/neighbour&gt;
-				&lt;/neighbours&gt;
-			&lt;/planet&gt;
-
-			...
-
-		&lt;/planets&gt;
-	&lt;errors/&gt;
-&lt;/response&gt;
+{
+  "planets": [
+    {
+      "id": 64,
+      "droids": 11,
+      "owner": "bot",
+      "type": "TYPE_C",
+      "neighbours": [
+        65,
+        63,
+        79
+      ]
+    },
+    {
+      "id": 65,
+      "droids": 27,
+      "owner": "bot",
+      "type": "TYPE_C",
+      "neighbours": [
+        64,
+        80,
+        66,
+        56,
+        63
+      ]
+    },
+	// ...
+    {
+      "id": 62,
+      "droids": 8,
+      "owner": "bot6",
+      "type": "TYPE_B",
+      "neighbours": [
+        55,
+        61,
+        77,
+        78,
+        63,
+        79
+      ]
+    },
+    {
+      "id": 63,
+      "droids": 12,
+      "owner": "bot",
+      "type": "TYPE_B",
+      "neighbours": [
+        64,
+        65,
+        55,
+        56,
+        62,
+        79
+      ]
+    }
+  ],
+  "errors": []
+}
 </pre>
 
 <p>Исходя из этих данных приложение игрока должно сформировать ответ. Ответ содержит список команд для передвижения юнитов, например:</p>
 
 <pre class="code">
-&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
-&lt;request&gt;
-	&lt;token&gt;abcdefghijklmnopqrstuvwxy&lt;/token&gt;
-	&lt;actions&gt;
-		&lt;action&gt;
-			&lt;from&gt;15&lt;/from&gt;
-			&lt;to&gt;25&lt;/to&gt;
-			&lt;unitscount&gt;1200&lt;/unitscount&gt;
-		&lt;/action&gt;
-		&lt;action&gt;
-			&lt;from&gt;15&lt;/from&gt;
-			&lt;to&gt;23&lt;/to&gt;
-			&lt;unitscount&gt;100&lt;/unitscount&gt;
-		&lt;/action&gt;
-		&lt;action&gt;
-			&lt;from&gt;15&lt;/from&gt;
-			&lt;to&gt;21&lt;/to&gt;
-			&lt;unitscount&gt;105&lt;/unitscount&gt;
-		&lt;/action&gt;
-	&lt;/actions&gt;
-&lt;/request&gt;
+{
+  "token": "a2425yzhzbhly5pbdtezl4puz1wcmttw",
+  "actions": [
+    {
+      "from": 67,
+      "to": 66,
+      "unitsCount": 15
+    },
+    {
+      "from": 67,
+      "to": 68,
+      "unitsCount": 15
+    },
+    {
+      "from": 67,
+      "to": 56,
+      "unitsCount": 18
+    },
+    {
+      "from": 67,
+      "to": 57,
+      "unitsCount": 18
+    },
+    {
+      "from": 81,
+      "to": 67,
+      "unitsCount": 13
+    }
+  ]
+}
 </pre>
 
 <p>Ответы на все ошибочные запросы отсылаются сервером почти сразу. Ответ на корректный запрос отсылается сервером после того, как в игре происходит следующий ход, и содержит описание игрового поля после этого хода.</p>

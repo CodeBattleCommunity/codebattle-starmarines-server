@@ -1,5 +1,7 @@
 package com.epam.game.bot.domain;
 
+import java.util.stream.Stream;
+
 public enum PlanetType {
     /**
      * Regeneration: +10% Maximum units: 100
@@ -34,6 +36,13 @@ public enum PlanetType {
     private PlanetType(double regen, int maxUnitsCount) {
         this.regen = regen;
         this.maxUnitsCount = maxUnitsCount;
+    }
+
+    public static PlanetType byName(String name) {
+        return Stream.of(values())
+                .filter(val -> val.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown planet type: " + name));
     }
 
     /**

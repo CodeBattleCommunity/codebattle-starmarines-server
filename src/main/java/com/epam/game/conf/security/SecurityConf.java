@@ -43,8 +43,11 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         .permitAll()
                     .antMatchers("/" + ViewsEnum.SIGN_UP + ViewsEnum.EXTENSION)
                         .permitAll()
+                    .antMatchers(ViewsEnum.WEBSOCKET_SERVER_URI)
+                        .permitAll()
                     .anyRequest().authenticated()
                 .and()
+                .csrf().disable() // TODO: for testing purposes only -> extract to separate spring profile
 
                 .formLogin()
                     .loginPage("/" + ViewsEnum.LOGIN + ViewsEnum.EXTENSION)

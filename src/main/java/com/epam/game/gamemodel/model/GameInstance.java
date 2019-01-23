@@ -6,12 +6,15 @@ import com.epam.game.domain.GameSettings;
 import com.epam.game.domain.User;
 import com.epam.game.exceptions.IllegalCommandException;
 import com.epam.game.exceptions.NotEnoughPlayersException;
+import com.epam.game.gameinfrastructure.requessthandling.PeerController;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
 import com.epam.game.gamemodel.mapgenerator.MapGenerator;
 import com.epam.game.gamemodel.model.events.GameAbandoned;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinished;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.util.*;
@@ -86,6 +89,10 @@ public class GameInstance extends Observable {
 	private Timestamp timeCreated;
 
 	private GameSettings gameSettings;
+
+	@Getter
+    @Setter
+    private Map<GameInstance, Set<PeerController>> clientsPeers = new HashMap<>();
 
 	public GameInstance(long id, GameType type, GameSettings gameSettings, User creator) {
 		this.vertices = new HashMap<>();
