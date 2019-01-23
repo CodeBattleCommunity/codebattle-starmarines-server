@@ -10,7 +10,7 @@ while true; do
 		-b | --build) REBUILD=true; shift ;;
 		-p | --port) PORT="$2"; shift ;;
 		-d | --db-port) DB_PORT="$2"; shift ;;
-		-h | --db-host) DB_HOST="$s"; shift ;;
+		-h | --db-host) DB_HOST="$2"; shift ;;
 		* ) break ;;
 	esac
 done
