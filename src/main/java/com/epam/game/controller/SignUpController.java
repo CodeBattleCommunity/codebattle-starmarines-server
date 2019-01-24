@@ -67,6 +67,7 @@ public class SignUpController {
         }
         this.signUpValidator.validate(signUpForm, result);
         if (result.hasErrors()) {
+            model.addAttribute(AttributesEnum.REGISTRATION_IS_OPEN, gameDAO.getSettings().isRegistrationOpened());
             return ViewsEnum.SIGN_UP;
         }
         List<GrantedAuthority> authorities = new ArrayList<>();

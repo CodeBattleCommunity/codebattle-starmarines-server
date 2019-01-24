@@ -10,10 +10,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Igor_Petrov@epam.com
@@ -54,10 +56,20 @@ public class ServerWebSocketHandler extends TextWebSocketHandler {
 
     private String extractToken(WebSocketSession session) {
         List<String> tokenHeaders = session.getHandshakeHeaders().get(RequestXMLTag.TOKEN.getValue());
-        if (CollectionUtils.isEmpty(tokenHeaders)) {
-            return null;
+
+        if (!CollectionUtils.isEmpty(tokenHeaders)) {
+            return tokenHeaders.get(0);
         }
 
-        return tokenHeaders.get(0);
+        Map<String, List<String>> requestParams = ((StandardWebSocketSession) session).getNativeSession().getRequestParameterMap();
+        if (!CollectionUtils.isEmpty(requestParams) && requestParams.containsKey(RequestXMLTag.TOKEN.getValue())) {
+            tokenHeaders = requestParams.get(RequestXMLTag.TOKEN.getValue());
+        }
+
+        if (!CollectionUtils.isEmpty(tokenHeaders)) {
+            return tokenHeaders.get(0);
+        }
+
+        return null;
     }
 }
