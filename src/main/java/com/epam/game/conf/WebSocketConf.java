@@ -20,6 +20,7 @@ public class WebSocketConf implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(socketHandler, "/galaxy");
+        registry.addHandler(socketHandler, "/galaxy")
+                .setAllowedOrigins("*");
     }
 }
