@@ -13,7 +13,9 @@
     <span id ="winner"> <spring:message code="label.currentGame.winner" /></span>
     <span id="winnerName"></span>
 </div>
-<div id = "container"></div>
+<div id = "container">
+	<canvas id="canv" width="512" height="512" style="position: absolute; z-index: 1; clear:both; top: 0px;"></canvas>
+</div>
 <c:choose>
 	<c:when test="${not empty game.players}">
 		<h2>Участники игры (<c:out value="${game.players.size()}" />)</h2>
@@ -42,3 +44,4 @@
 </c:choose>
 <br />
 <h3><a href="deleteGame.html?gameId=${game.id}">Удалить игру</a></h3>
+<h1>GAME CONTROL PAGE</h1>
