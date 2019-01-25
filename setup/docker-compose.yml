@@ -12,8 +12,8 @@ services:
     depends_on:
       - hardinv-db
     environment:
-      - SPRING_DATABASE_HOST=hardinv-db
-      - SPRING_DATABASE_PORT=5432
+      - SPRING_DATASOURCE_HOST=hardinv-db
+      - SPRING_DATASOURCE_PORT=5432
 
   hardinv-db:
       image: dojo/postgres:10
