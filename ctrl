@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+IMAGE_TAG=dojo/hardinv-server:0.0.1
+
 REBUILD=false
 RUN=false
 STOP=false
@@ -22,7 +24,7 @@ function build_server_image() {
     echo "########################################################"
     echo "#                 Building server                      #"
     echo "########################################################"
-    cd $cur_dir && docker build -t dojo/hardinv-server:0.0.1 -f setup/app/Dockerfile .
+    cd $cur_dir && docker rmi -f $IMAGE_TAG && docker build -t $IMAGE_TAG -f setup/app/Dockerfile .
     go_home
 }
 
