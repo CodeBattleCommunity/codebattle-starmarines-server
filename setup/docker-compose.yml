@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  hardinv-server:
+    image: dojo/hardinv-server:0.0.1
+    container_name: hardinv-server
+    restart: on-failure
+    networks:
+      - hardinv-net
+    ports:
+      - '8085:8080'
+    depends_on:
+      - hardinv-db
+    environment:
+      - SPRING_DATABASE_HOST=hardinv-db
+      - SPRING_DATABASE_PORT=5432
+
+  hardinv-db:
+      image: dojo/postgres:10
+      container_name: hardinv-db
+      networks:
+        - hardinv-net
+      ports:
+        - '5434:5432'
+
+networks:
+  hardinv-net:
+    internal: true
