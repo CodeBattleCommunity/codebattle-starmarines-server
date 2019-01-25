@@ -44,4 +44,3 @@
 </c:choose>
 <br />
 <h3><a href="deleteGame.html?gameId=${game.id}">Удалить игру</a></h3>
-<h1>GAME CONTROL PAGE</h1>
