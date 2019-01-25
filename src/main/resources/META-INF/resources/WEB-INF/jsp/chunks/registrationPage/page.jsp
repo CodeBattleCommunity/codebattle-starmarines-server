@@ -13,7 +13,7 @@
             </div>
             <div class="form-row">
                 <label style="white-space: nowrap;"><spring:message htmlEscape="false" code="label.signUp.email"/>:</label>
-                <form:input maxlength="200" path="email" />
+                <form:input maxlength="200" path="email" />@epam.com
                 <form:errors path="email" cssClass="errors" />
             </div>
             <%--<div class="form-row">--%>
