@@ -15,3 +15,8 @@ spring:
     cache-names: settings
     caffeine:
       spec: expireAfterAccess=5s
+
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
