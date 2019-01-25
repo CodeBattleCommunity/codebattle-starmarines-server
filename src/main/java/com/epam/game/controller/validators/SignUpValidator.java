@@ -48,7 +48,7 @@ public class SignUpValidator implements Validator {
             }
         }
         if (err.getFieldErrorCount("email") == 0) {
-            if ( !CVUtils.isGoodEmailPart(signUpForm.getEmail()) ) {
+            if ( !CVUtils.isEmailValid(signUpForm.getEmail()) ) {
                 err.rejectValue("email", "email.invalid.signUpForm.email");
             }
         }
