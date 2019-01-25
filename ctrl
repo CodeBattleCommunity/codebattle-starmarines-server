@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+REBUILD=false
+RUN=false
+STOP=false
+
+cur_dir=`pwd`
+
+function go_home() {
+    cd "$cur_dir"
+}
+
+function build_db_image() {
+    echo "########################################################"
+    echo "#                   Building DB                        #"
+    echo "########################################################"
+    cd "$cur_dir/setup/db" && ./build.sh
+    go_home
+}
+
+function build_server_image() {
+    echo "########################################################"
+    echo "#                 Building server                      #"
+    echo "########################################################"
+    cd $cur_dir && docker build -t dojo/hardinv-server:0.0.1 -f setup/app/Dockerfile .
+    go_home
+}
+
+function build() {
+    build_db_image
+    build_server_image
+}
+
+function run() {
+    cd "$cur_dir/setup" && docker-compose up -d
+    go_home
+}
+
+function down() {
+    cd "$cur_dir/setup" && docker-compose down
+    go_home
+}
+
+while true; do
+        case "$1" in
+                -b | --build) REBUILD=true; shift ;;
+                -r | --run) RUN=true; shift ;;
+		-s | --stop) STOP=true; shift ;;
+                * ) break ;;
+        esac
+done
+
+if [[ "$STOP" = true ]]; then
+    down
+fi
+
+if [[ "$REBUILD" = true ]]; then
+    build
+fi
+
+if [[ "$RUN" = true ]]; then
+    run
+fi
