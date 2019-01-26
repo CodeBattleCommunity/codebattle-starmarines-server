@@ -420,7 +420,7 @@ public class GameController {
             info.setCreator(userDAO.getUserWith(gameStats.getCreatorId()));
             model.addAttribute(AttributesEnum.GAME_INFO, info);
         }
-        Map<Long, GameInstance> games = gameModel.getNotStartedTournaments();
+        Map<Long, GameInstance> games = gameModel.getAllTournaments();
         Map<Long, GameInfo> gamesToShow = new HashMap<Long, GameInfo>(games.size());
         for(Long gameId : games.keySet()) {
             GameInfo gameInfo = new GameInfo();
