@@ -3887,6 +3887,10 @@ var initBlock = {
                             }
                             break;
                         default:
+                            try {
+                                initBlock.started = true;
+                                initBlock.init(json);
+                            } catch (e) {}
                             initBlock.notGameStatus(json);
                         
                             break;
