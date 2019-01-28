@@ -1,3 +1,4 @@
+<%@ page contentType="text/html; charset=UTF-8" %>
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/welcome.css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/classCommon.css" />
 <script>
@@ -7,11 +8,24 @@
     var loginFormPivot = "#login-pivot";
     var visible = false;
 
-
     jQuery(document).ready(function(){
-        if(jQuery(loginFormSelector + " " + errorSelector).size() != 0){
-            toggleLoginForm();
+      var params = new URLSearchParams(window.location.search);
+      if (params.has('error')) {
+        toggleLoginForm();
+      }
+    });
+
+    $(document).on('submit','#login-form',function(event) {
+      var array = $('input');
+      var hasErrors = false;
+      $("span[class|='errors']").remove();
+      for (var i = 0; i < array.length; i++) {
+        if(array[i].value.trim().length === 0) {
+          $(array[i]).after("<span class=\"errors\">Поле должно быть заполнено!</span>");
+          hasErrors = true;
         }
+      }
+      if (hasErrors) event.preventDefault();
     });
 
     function toggleLoginForm() {
