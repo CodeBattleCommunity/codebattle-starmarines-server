@@ -105,7 +105,6 @@ public class GameDAO {
 	@AllArgsConstructor
 	private enum SettingsOption {
 		READING_TIMEOUT(Long::valueOf),
-		PORT(Long::valueOf),
 		GAME_TURN_DELAY(Long::valueOf),
 		TRAINIG_BOT_LOGINS(v -> Arrays.asList(v.split(","))),
 		NEXT_GAME_TIME(v -> LocalDateTime.parse(v, DateTimeFormatter.ISO_DATE_TIME)),
@@ -114,7 +113,8 @@ public class GameDAO {
 		REGISTRATION_IS_OPEN(Boolean::valueOf),
 		MINIMAL_PLAYERS_NUMBER(Integer::valueOf),
 		MAXIMAL_PLAYERS_NUMBER(Integer::valueOf),
-		GAME_TURNS_LIMIT(Long::valueOf);
+		GAME_TURNS_LIMIT(Long::valueOf),
+		USER_BATTLE_CREATION_ENABLED(Boolean::valueOf);
 
 
 		@Getter
@@ -162,39 +162,39 @@ public class GameDAO {
 
 	@Cacheable("settings")
     public GameSettings getSettings() {
-		return jdbcTemplate.queryForObject("select \"ID\", \"VAL\" from \"SETTINGS\"", settingsMapper);
+		return jdbcTemplate.queryForObject("select ID, VAL from SETTINGS", settingsMapper);
 	}
 
     public Long getNumberOfPlayedGamesFor(User user) {
-//	    "select count(*) from \"GAME_SESSION_STATISTICS\" where \"USER_ID\" = ?"
-        final List<Long> longs = jdbcTemplate.queryForList("select count(*) from \"GAME_SESSION_STATISTICS\" where \"USER_ID\" = ? and \"TYPE\" <> '"+GameType.TRAINING_LEVEL.name()+"'", Long.class, user.getId());
+//	    "select count(*) from GAME_SESSION_STATISTICS where USER_ID = ?"
+        final List<Long> longs = jdbcTemplate.queryForList("select count(*) from GAME_SESSION_STATISTICS where USER_ID = ? and TYPE <> '"+GameType.TRAINING_LEVEL.name()+"'", Long.class, user.getId());
         return longs.isEmpty() ? 0L : longs.get(0);
     }
 
     public Long getNumberOfWonGamesFor(User user) {
-//	    "select count(*) from \"GAME_SESSION_STATISTICS\" where \"USER_ID\" = 10 and \"PLACE\" = 1"
-        final List<Long> longs = jdbcTemplate.queryForList("select count(*) from \"GAME_SESSION_STATISTICS\" where \"USER_ID\" = ? and \"PLACE\" = 1",
+//	    "select count(*) from GAME_SESSION_STATISTICS where USER_ID = 10 and PLACE = 1"
+        final List<Long> longs = jdbcTemplate.queryForList("select count(*) from GAME_SESSION_STATISTICS where USER_ID = ? and PLACE = 1",
                 Long.class, user.getId());
         return longs.isEmpty() ? 0L : longs.get(0);
     }
 
     public void addGame(Game game) {
         doRequestForGame(
-                "INSERT INTO \"GAME_STATISTICS\" (\"TITLE\", \"TYPE\", \"DESCRIPTION\", \"WINNER_ID\", \"CREATOR_ID\", \"NUMBER_OF_TURNS\", \"LOG_PATH\", \"STATE\", \"TIME_CREATED\", \"GAME_ID\" ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO GAME_STATISTICS (TITLE, TYPE, DESCRIPTION, WINNER_ID, CREATOR_ID, NUMBER_OF_TURNS, LOG_PATH, STATE, TIME_CREATED, GAME_ID ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 game);
     }
 
     public void updateGame(final Game game, final GameInstance instance) {
-	    jdbcTemplate.batchUpdate("INSERT INTO \"GAME_SESSION_STATISTICS\" " +
-	                             "(\"CREATOR_ID\", " +
-	                             "\"GAME_ID\", " +
-	                             "\"USER_ID\", " +
-	                             "\"UNIT_COUNT\", " +
-	                             "\"NUMBER_OF_TURNS\", " +
-	                             "\"PLACE\", " +
-	                             "\"BOT_NAME\", " +
-	                             "\"TYPE\", " +
-	                             "\"EMAIL\") " +
+	    jdbcTemplate.batchUpdate("INSERT INTO GAME_SESSION_STATISTICS " +
+	                             "(CREATOR_ID, " +
+	                             "GAME_ID, " +
+	                             "USER_ID, " +
+	                             "UNIT_COUNT, " +
+	                             "NUMBER_OF_TURNS, " +
+	                             "PLACE, " +
+	                             "BOT_NAME, " +
+	                             "TYPE, " +
+	                             "EMAIL) " +
 	                             "VALUES (?,?,?,?,?,?,?,?,?) ", new BatchPreparedStatementSetter() {
 		    @Override
 		    public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -220,20 +220,20 @@ public class GameDAO {
 	    });
 
 	    doRequestForGame(
-			    "UPDATE \"GAME_STATISTICS\" SET \"TITLE\" = ?, \"TYPE\" = ?, \"DESCRIPTION\" = ?, \"WINNER_ID\" = ?, \"CREATOR_ID\" = ?, \"NUMBER_OF_TURNS\" = ?, \"LOG_PATH\" = ?, \"STATE\" = ?, \"TIME_CREATED\" = ? WHERE \"GAME_ID\" = ?",
+			    "UPDATE GAME_STATISTICS SET TITLE = ?, TYPE = ?, DESCRIPTION = ?, WINNER_ID = ?, CREATOR_ID = ?, NUMBER_OF_TURNS = ?, LOG_PATH = ?, STATE = ?, TIME_CREATED = ? WHERE GAME_ID = ?",
 			    game);
     }
 
     public Game getById(Long gameId) {
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM \"GAME_STATISTICS\" WHERE \"GAME_ID\" = ?", rowMapper, gameId));
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM GAME_STATISTICS WHERE GAME_ID = ?", rowMapper, gameId));
     }
 
     public void deleteById(Long gameId) {
-        jdbcTemplate.update("DELETE FROM \"GAME_STATISTICS\" WHERE \"GAME_ID\" = ?", gameId);
+        jdbcTemplate.update("DELETE FROM GAME_STATISTICS WHERE GAME_ID = ?", gameId);
     }
 
     public List<Game> getFinishedGames() {
-        return jdbcTemplate.query("SELECT * FROM \"GAME_STATISTICS\" WHERE \"STATE\" = 'FINISHED'", rowMapper);
+        return jdbcTemplate.query("SELECT * FROM GAME_STATISTICS WHERE STATE = 'FINISHED'", rowMapper);
     }
 
 	public List<Game> getStatistics() {
@@ -252,16 +252,16 @@ public class GameDAO {
 		Timestamp longTimeAgo = new Timestamp(gc.getTimeInMillis());
 		parameters.addValue("longTimeAgo", longTimeAgo);
 		parameters.addValue("rowsToShow", Settings.STAT_ROWS_TO_SHOW);
-//		List<Game> recentGames = jdbcTemplate.query("select * from \"GAME_STATISTICS\" where \"TIME_CREATED\" notnull and \"TIME_CREATED\" > ? and \"TYPE\" = 'BATTLE' and \"STATE\" = 'FINISHED' order by \"TIME_CREATED\" desc limit 30", rowMapper, longTimeAgo);
+//		List<Game> recentGames = jdbcTemplate.query("select * from GAME_STATISTICS where TIME_CREATED notnull and TIME_CREATED > ? and TYPE = 'BATTLE' and STATE = 'FINISHED' order by TIME_CREATED desc limit 30", rowMapper, longTimeAgo);
 
-		List<Game> recentGames = namedTemplate.query("select * from \"GAME_STATISTICS\" where \"GAME_ID\" in (select \"GAME_ID\" from \"GAME_SESSION_STATISTICS\" group by \"GAME_ID\") and \"TYPE\" <> '" + GameType.TRAINING_LEVEL.name() + "' and \"TIME_CREATED\" notnull order by \"TIME_CREATED\" desc limit (:rowsToShow)",parameters, rowMapper);
+		List<Game> recentGames = namedTemplate.query("select * from GAME_STATISTICS where GAME_ID in (select GAME_ID from GAME_SESSION_STATISTICS group by GAME_ID) and TYPE <> '" + GameType.TRAINING_LEVEL.name() + "' and TIME_CREATED notnull order by TIME_CREATED desc limit (:rowsToShow)",parameters, rowMapper);
 		List<Long> ids = new ArrayList(recentGames.size());
 		for(Game g : recentGames) {
 			ids.add(g.getGameId());
 		}
 		parameters.addValue("ids", ids);
 		if(ids.size() > 0) {
-			List<UserScore> statistics = namedTemplate.query("select * from \"GAME_SESSION_STATISTICS\" where \"GAME_ID\" in (:ids)", parameters, statMapper);
+			List<UserScore> statistics = namedTemplate.query("select * from GAME_SESSION_STATISTICS where GAME_ID in (:ids)", parameters, statMapper);
 			for(Game g : recentGames) {
 				g.setStatistics(new LinkedList<UserScore>());
 				for(UserScore us : statistics) {
@@ -290,15 +290,15 @@ public class GameDAO {
     }
 
     public List<Game> getFinishedTournaments() {
-        return jdbcTemplate.query("SELECT * FROM \"GAME_STATISTICS\" WHERE \"STATE\" = 'FINISHED' AND \"TYPE\" <> 'TRAINING_LEVEL' ", rowMapper);
+        return jdbcTemplate.query("SELECT * FROM GAME_STATISTICS WHERE STATE = 'FINISHED' AND TYPE <> 'TRAINING_LEVEL' ", rowMapper);
     }
 
     public void addPlayer(Long userId, Long gameId) {
-        jdbcTemplate.update("DELETE FROM \"PLAYERS\" WHERE \"USER_ID\"=? AND \"GAME_ID\"=?", userId, gameId);
+        jdbcTemplate.update("DELETE FROM PLAYERS WHERE USER_ID=? AND GAME_ID=?", userId, gameId);
     }
 
     public void deletePlayer(Long userId, Long gameId) {
-        jdbcTemplate.update("INSERT INTO \"PLAYERS\" (\"USER_ID\", \"GAME_ID\") VALUES(?, ?)", userId, gameId);
+        jdbcTemplate.update("INSERT INTO PLAYERS (USER_ID, GAME_ID) VALUES(?, ?)", userId, gameId);
     }
 
     private void doRequestForGame(String request, Game game) {
@@ -323,7 +323,7 @@ public class GameDAO {
 		
 		parameters.addValue("botNames", getSettings().getTrainigBotLogins());
 		String query = "select \n" +
-		               "commonCount.\"TYPE\" game_TYPE, \n" +
+		               "commonCount.TYPE game_TYPE, \n" +
 		               "commonCount.count GAME_COUNT, \n" +
 		               "theZerg.botName ZERG_NAME,\n" +
 		               "theZerg.unitCount ZERG_COUNT,\n" +
@@ -332,21 +332,21 @@ public class GameDAO {
 		               "theFastest.botName FASTEST_NAME,\n" +
 		               "theFastest.numberOfTurns FASTEST_NUMBER_OF_TURNS\n" +
 		               "from\n" +
-		               "(select count(*), gs.\"TYPE\" from \"GAME_STATISTICS\" gs where \"STATE\"='FINISHED' group by gs.\"TYPE\") as commonCount left join\n" +
-		               "(select distinct (array_agg(\"UNIT_COUNT\"))[1]as unitCount, (array_agg(\"BOT_NAME\"))[1] as botName, \"TYPE\" from \"GAME_SESSION_STATISTICS\" where \"BOT_NAME\" not in (:botNames) and \"UNIT_COUNT\" in (select max(\"UNIT_COUNT\") from \"GAME_SESSION_STATISTICS\" group by \"TYPE\") group by \"TYPE\") as theZerg\n" +
-		               "on commonCount.\"TYPE\" = theZerg.\"TYPE\" left join\n" +
+		               "(select count(*), gs.TYPE from GAME_STATISTICS gs where STATE='FINISHED' group by gs.TYPE) as commonCount left join\n" +
+		               "(select distinct (array_agg(UNIT_COUNT))[1]as unitCount, (array_agg(BOT_NAME))[1] as botName, TYPE from GAME_SESSION_STATISTICS where BOT_NAME not in (:botNames) and UNIT_COUNT in (select max(UNIT_COUNT) from GAME_SESSION_STATISTICS group by TYPE) group by TYPE) as theZerg\n" +
+		               "on commonCount.TYPE = theZerg.TYPE left join\n" +
 		               "\n" +
 		               "--hardest = max game count\n" +
-		               "(select (array_agg(count))[1] count, (array_agg(\"BOT_NAME\"))[1] botName, \"TYPE\" from (select * from (select count(*),\"BOT_NAME\",\"TYPE\" from \"GAME_SESSION_STATISTICS\" where \"BOT_NAME\" not in (:botNames) group by \"BOT_NAME\", \"TYPE\") games order by count desc) gssx group by \"TYPE\"\n" +
+		               "(select (array_agg(count))[1] count, (array_agg(BOT_NAME))[1] botName, TYPE from (select * from (select count(*),BOT_NAME,TYPE from GAME_SESSION_STATISTICS where BOT_NAME not in (:botNames) group by BOT_NAME, TYPE) games order by count desc) gssx group by TYPE\n" +
 		               "\n" +
 		               ") as theHardest\n" +
-		               "on commonCount.\"TYPE\" = theHardest.\"TYPE\" left join \n" +
+		               "on commonCount.TYPE = theHardest.TYPE left join \n" +
 		               "\n" +
 		               "--fastest = max wins\n" +
-		               "(select (array_agg(count))[1] numberOfTurns, (array_agg(\"BOT_NAME\"))[1] botName, \"TYPE\" from (select * from (select count(*),\"BOT_NAME\",\"TYPE\" from \"GAME_SESSION_STATISTICS\" where \"BOT_NAME\" not in (:botNames) and \"PLACE\" = 1 group by \"BOT_NAME\", \"TYPE\") games order by count desc) gssx group by \"TYPE\")\n" +
+		               "(select (array_agg(count))[1] numberOfTurns, (array_agg(BOT_NAME))[1] botName, TYPE from (select * from (select count(*),BOT_NAME,TYPE from GAME_SESSION_STATISTICS where BOT_NAME not in (:botNames) and PLACE = 1 group by BOT_NAME, TYPE) games order by count desc) gssx group by TYPE)\n" +
 		               "\n" +
 		               "\t  as theFastest\n" +
-		               "\t on commonCount.\"TYPE\" = theFastest.\"TYPE\"";
+		               "\t on commonCount.TYPE = theFastest.TYPE";
 
 		return namedTemplate.query(query, parameters, commonStatMapper);
 	}

@@ -12,6 +12,6 @@ docker run --name postgres-hardinv \
     -v "$DATA_VOLUME_MOUNTPOINT:$PDATA" \
     -p 5432:5432 \
     -d \
-    dojo/postgres:10
+    dojo/postgres:hardinv
 
 
