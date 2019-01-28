@@ -43,23 +43,23 @@ public class UserDAO {
     }
 
     public User getUserWith(String login, String password) {
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM \"USERS\" WHERE \"LOGIN\" = ? AND \"PASSWORD\" = ?", rowMapper, login, password));
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM USERS WHERE LOGIN = ? AND PASSWORD = ?", rowMapper, login, password));
     }
 
     public User getUserWith(Long userId) {
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM \"USERS\" WHERE \"ID\" = ?", rowMapper, userId));
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM USERS WHERE ID = ?", rowMapper, userId));
     }
 
     public User getUserWith(String login) {
-        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM \"USERS\" WHERE \"LOGIN\" = ?", rowMapper, login));
+        return DataAccessUtils.singleResult(jdbcTemplate.query("SELECT * FROM USERS WHERE LOGIN = ?", rowMapper, login));
     }
 
     public void addAuthorityToUser(Long userId, GrantedAuthority authority) {
-        jdbcTemplate.update("INSERT INTO \"AUTHORITIES\" (\"USER_ID\", \"AUTHORITY\") VALUES(?, ?)", userId, authority.getAuthority());
+        jdbcTemplate.update("INSERT INTO AUTHORITIES (USER_ID, AUTHORITY) VALUES(?, ?)", userId, authority.getAuthority());
     }
 
     public void addUser(User user) {
-        jdbcTemplate.update("INSERT INTO \"USERS\" (\"USER_NAME\", \"LOGIN\", \"PASSWORD\",  \"TOKEN\", \"EMAIL\") VALUES(?, ?, ?, ?, ?)",
+        jdbcTemplate.update("INSERT INTO USERS (USER_NAME, LOGIN, PASSWORD,  TOKEN, EMAIL) VALUES(?, ?, ?, ?, ?)",
                 user.getUserName(), user.getLogin(), user.getPassword(), user.getToken(), user.getEmail());
         User userFromDB = getUserWith(user.getLogin(), user.getPassword());
         if (userFromDB != null) {
@@ -70,12 +70,12 @@ public class UserDAO {
     }
 
     public void updateUser(User user) {
-        jdbcTemplate.update("UPDATE \"USERS\" SET \"USER_NAME\" = ?, \"LOGIN\" = ?, \"PASSWORD\" = ?, \"TOKEN\" = ?, \"EMAIL\" = ? WHERE \"ID\" = ?",
+        jdbcTemplate.update("UPDATE USERS SET USER_NAME = ?, LOGIN = ?, PASSWORD = ?, TOKEN = ?, EMAIL = ? WHERE ID = ?",
                 user.getUserName(), user.getLogin(), user.getPassword(), user.getToken(), user.getEmail(), user.getId());
     }
 
     private List<GrantedAuthority> getUserAuthorities(Long userId) {
-        return jdbcTemplate.query("SELECT * FROM \"AUTHORITIES\" WHERE \"USER_ID\" = ?", new RowMapper<GrantedAuthority>() {
+        return jdbcTemplate.query("SELECT * FROM AUTHORITIES WHERE USER_ID = ?", new RowMapper<GrantedAuthority>() {
             @Override
             public GrantedAuthority mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new SimpleGrantedAuthority(rs.getString("AUTHORITY"));

@@ -16,8 +16,10 @@ services:
       - SPRING_DATASOURCE_PORT=5432
 
   hardinv-db:
-      image: dojo/postgres:10
+      image: dojo/postgres:hardinv
       container_name: hardinv-db
+      volumes:
+        - '/data/hardinv:/var/lib/postgresql/data/pgdata'
       networks:
         - hardinv-net
       ports:

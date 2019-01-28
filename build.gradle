@@ -44,6 +44,7 @@ dependencies {
     implementation 'org.apache.tiles:tiles-servlet:3.0.8'
     implementation 'org.apache.tiles:tiles-request-api:1.0.6'
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+    implementation 'org.liquibase:liquibase-core'
 
     compile 'org.projectlombok:lombok:1.16.20'
 
