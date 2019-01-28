@@ -1,11 +1,11 @@
 spring:
   datasource:
     port: 5432
-    host: epruizhw0388
+    host: localhost
     driver-class-name: org.postgresql.Driver
     url: 'jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/hardinv'
-    username: HIapp
-    password: hardcoded2014
+    username: postgres
+    password: root
 
   security:
     user:
