@@ -19,11 +19,13 @@ services:
       image: dojo/postgres:hardinv
       container_name: hardinv-db
       volumes:
-        - '/data/hardinv:/var/lib/postgresql/data/pgdata'
+        - '/data/hardinv:/var/lib/postgresql/data/pgdata-hardinv'
       networks:
         - hardinv-net
       ports:
         - '5434:5432'
+      environment:
+        - 'PGDATA=/var/lib/postgresql/data/pgdata-hardinv'
 
 networks:
   hardinv-net:
