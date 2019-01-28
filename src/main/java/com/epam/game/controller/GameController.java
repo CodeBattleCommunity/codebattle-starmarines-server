@@ -69,7 +69,7 @@ public class GameController {
     @RequestMapping(value = "/" + ViewsEnum.BATTLE + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showBattle(@AuthenticationPrincipal User client, ModelMap model) {
 
-        if (client.hasAnyRole("ROLE_ADMIN")) {
+        if (client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())) {
             if (!model.containsAttribute(AttributesEnum.CREATE_GAME_FORM)) {
                 CreateGameForm createGameForm = new CreateGameForm();
                 model.addAttribute(AttributesEnum.CREATE_GAME_FORM, createGameForm);
@@ -89,7 +89,7 @@ public class GameController {
             model.addAttribute(AttributesEnum.GAME_INFO, info);
         }
         Map<Long, GameInstance> games;
-        if (client.hasAnyRole("ROLE_ADMIN")) {
+        if (client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())) {
             games = gameModel.getAllTournaments();
             if (!model.containsAttribute(AttributesEnum.CREATE_GAME_FORM)) {
                 CreateGameForm createGameForm = new CreateGameForm();
@@ -420,7 +420,11 @@ public class GameController {
             info.setCreator(userDAO.getUserWith(gameStats.getCreatorId()));
             model.addAttribute(AttributesEnum.GAME_INFO, info);
         }
-        Map<Long, GameInstance> games = gameModel.getAllTournaments();
+
+        Map<Long, GameInstance> games = client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())
+            ? gameModel.getAllTournaments()
+            : gameModel.getNotStartedGames();
+
         Map<Long, GameInfo> gamesToShow = new HashMap<Long, GameInfo>(games.size());
         for(Long gameId : games.keySet()) {
             GameInfo gameInfo = new GameInfo();
