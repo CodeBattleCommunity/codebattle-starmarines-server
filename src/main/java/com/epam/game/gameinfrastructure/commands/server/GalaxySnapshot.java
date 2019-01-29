@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +17,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Accessors(chain = true)
 public class GalaxySnapshot {
     @Builder.Default
     private List<PlanetInfo> planets = new ArrayList<>();
+    @Builder.Default
+    private List<DisasterInfo> disasters = new ArrayList<>();
     @Builder.Default
     private List<String> errors = new ArrayList<>();
 }

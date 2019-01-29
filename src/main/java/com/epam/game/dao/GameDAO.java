@@ -3,10 +3,7 @@ package com.epam.game.dao;
 import com.epam.game.constants.GameState;
 import com.epam.game.constants.GameType;
 import com.epam.game.constants.Settings;
-import com.epam.game.domain.CommonStatistics;
-import com.epam.game.domain.Game;
-import com.epam.game.domain.GameSettings;
-import com.epam.game.domain.User;
+import com.epam.game.domain.*;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.UserScore;
 import lombok.AllArgsConstructor;
@@ -114,8 +111,11 @@ public class GameDAO {
 		MINIMAL_PLAYERS_NUMBER(Integer::valueOf),
 		MAXIMAL_PLAYERS_NUMBER(Integer::valueOf),
 		GAME_TURNS_LIMIT(Long::valueOf),
-		USER_BATTLE_CREATION_ENABLED(Boolean::valueOf);
-
+		USER_BATTLE_CREATION_ENABLED(Boolean::valueOf),
+		LOCAL_DISASTER_PROBABILITY_PER_VERTEX(Double::valueOf),
+		LOCAL_DISASTER_DAMAGE(Double::valueOf),
+		INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE(Double::valueOf),
+		INTER_PLANET_DISASTER_DAMAGE(Double::valueOf);
 
 		@Getter
 		private Function<String, Object> extractor;
@@ -139,6 +139,13 @@ public class GameDAO {
 				settings.put(option, option.getExtractor().apply(val));
 			} while (rs.next());
 
+			DisasterSettings disasterSettings = DisasterSettings.builder()
+					.interPlanetDisasterFactor((Double) settings.get(SettingsOption.INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE))
+					.interPlanetDisasterDamage((Double) settings.get(SettingsOption.INTER_PLANET_DISASTER_DAMAGE))
+					.localDisasterFactor((Double) settings.get(SettingsOption.LOCAL_DISASTER_PROBABILITY_PER_VERTEX))
+					.localDisasterDamage((Double) settings.get(SettingsOption.LOCAL_DISASTER_DAMAGE))
+					.build();
+
 			return GameSettings.builder()
 					.clientTimeoutMs((Long) settings.get(SettingsOption.READING_TIMEOUT))
 					.turnDelayMs((Long) settings.get(SettingsOption.GAME_TURN_DELAY))
@@ -150,6 +157,7 @@ public class GameDAO {
 					.minPlayers((Integer) settings.get(SettingsOption.MINIMAL_PLAYERS_NUMBER))
 					.maxPlayers((Integer) settings.get(SettingsOption.MAXIMAL_PLAYERS_NUMBER))
 					.roundTurns((Long) settings.get(SettingsOption.GAME_TURNS_LIMIT))
+					.disasterSettings(disasterSettings)
 					.build();
 		}
 	};

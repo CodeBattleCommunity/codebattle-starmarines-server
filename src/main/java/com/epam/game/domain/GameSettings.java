@@ -24,4 +24,5 @@ public class GameSettings {
     private boolean registrationOpened;
     private long errorDelayMs;
     private int startRowsToShow;
+    private DisasterSettings disasterSettings;
 }

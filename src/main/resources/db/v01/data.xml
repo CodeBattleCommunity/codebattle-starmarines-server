@@ -62,4 +62,33 @@
             <column name="VAL" value="true" />
         </insert>
     </changeSet>
+
+    <changeSet id="add_settings_description_column" author="Igor_Petrov@epam.com">
+        <addColumn tableName="SETTINGS">
+            <column name="description" type="varchar(1024)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_disaster_settings_0" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_PROBABILITY_PER_VERTEX" />
+            <column name="VAL" value="0.3" />
+            <column name="DESCRIPTION">Вероятность возникновения катастрофы на планете. В % за один игровой тик [0-1]</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE" />
+            <column name="VAL" value="0.3" />
+            <column name="DESCRIPTION">Вероятность возникновения черной дыры на ребре между двух планет. В % за один игровой тик [0-1]</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_DAMAGE" />
+            <column name="VAL" value="0.8" />
+            <column name="DESCRIPTION">Кол-во уничтожаемых катастрофой юнитов на планете. В % [0-1]</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_DAMAGE" />
+            <column name="VAL" value="1" />
+            <column name="DESCRIPTION">Кол-во уничтожаемых юнитов при попадании в черную дыру между планет. В % [0-1]</column>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
