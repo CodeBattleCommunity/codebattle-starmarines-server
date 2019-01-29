@@ -3811,7 +3811,7 @@ var initBlock = {
             span.style.display = "block ";
             span.style.paddingTop = '20px';
 
-            if(renderBlock.started) {
+            if(renderBlock.started || (message.scores || []).length > 0) {
                 initBlock.showWinners(message.scores);
             }
             if(!renderBlock.started) {
@@ -3887,10 +3887,6 @@ var initBlock = {
                             }
                             break;
                         default:
-                            try {
-                                initBlock.started = true;
-                                initBlock.init(json);
-                            } catch (e) {}
                             initBlock.notGameStatus(json);
                         
                             break;
