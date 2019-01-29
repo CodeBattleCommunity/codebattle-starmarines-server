@@ -1521,6 +1521,7 @@ var renderBlock = {
 
 	    }
 
+        players.sort(function (a, b) { return stats[a.name] < stats[b.name] ? 1 : -1 });
         for(player in players ){
 
 	        name = players[player].name;
@@ -3760,7 +3761,6 @@ var initBlock = {
         animate();
 
         initBlock.actionUpdater = window.setInterval(loopBlock.updateActions, renderBlock.turnSpeed/2);
-
     },
 
     showWinners: function(scores) {
