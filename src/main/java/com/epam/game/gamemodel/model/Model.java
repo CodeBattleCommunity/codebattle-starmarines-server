@@ -8,6 +8,7 @@ import com.epam.game.domain.User;
 import com.epam.game.gamemodel.mapgenerator.MapGenerator;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -24,13 +25,9 @@ import java.util.Map;
 @Resource
 public class Model {
 
-    private Map<Long, GameInstance> games;
+    private Map<Long, GameInstance> games = new ConcurrentHashMap<>();
     private static volatile Model model = new Model();
     private GameDAO gameDAO;
-
-    private Model() {
-        games = new HashMap<Long, GameInstance>();
-    }
 
     @Autowired
     public void setGameDAO(GameDAO gameDAO) {

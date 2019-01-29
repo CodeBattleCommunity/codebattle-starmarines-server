@@ -3,11 +3,18 @@ package com.epam.game.gameinfrastructure.requessthandling;
 import com.epam.game.domain.User;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Vertex;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Singleton keeps the map of games and sockets of clients.
@@ -45,7 +52,7 @@ public class SocketResponseSender implements Observer {
     public void addSocketToGame(GameInstance game, PeerController pc) {
         synchronized (game) {
             if (!game.getClientsPeers().containsKey(game)) {
-                game.getClientsPeers().put(game, new HashSet<PeerController>());
+                game.getClientsPeers().put(game, ConcurrentHashMap.newKeySet());
             }
             game.getClientsPeers().get(game).add(pc);
         }
@@ -129,7 +136,7 @@ public class SocketResponseSender implements Observer {
                     }
                 }
             }
-            game.getClientsPeers().put(game, new HashSet<>() );
+            game.getClientsPeers().put(game, ConcurrentHashMap.newKeySet());
         }
     }
 
