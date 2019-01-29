@@ -10,16 +10,14 @@ import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.model.action.impl.LoginAction;
 import com.epam.game.gamemodel.model.action.impl.MoveAction;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketSession;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketSession;
 
 /**
  * @author Igor_Petrov@epam.com
@@ -36,10 +34,6 @@ public class CommandManagerImpl implements CommandManager {
     @Override
     public void handleUserCommands(WebSocketSession session, String token, String clientPayload) {
         ClientCommand clientCommand = commandConverter.convertToClientCommand(clientPayload);
-
-        if (CollectionUtils.isEmpty(clientCommand.getActions())) {
-            return;
-        }
 
         GameInstance game = obtainGame(token);
 
