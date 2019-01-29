@@ -42,6 +42,8 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
                         .permitAll()
                     .antMatchers("/" + ViewsEnum.SIGN_UP + ViewsEnum.EXTENSION)
                         .permitAll()
+                    .antMatchers("/" + ViewsEnum.INFO_PAGE + ViewsEnum.EXTENSION)
+                        .permitAll()
                     .antMatchers(ViewsEnum.WEBSOCKET_SERVER_URI)
                         .permitAll()
                     .anyRequest().authenticated()
