@@ -84,7 +84,9 @@ public class ProfileController {
         GameInstance game = gameModel.getByUser(client.getId());
         if (game == null) {
             User user = userDAO.getUserWith(client.getId());
-            user.setToken(TokenGenerator.generate());
+            String newToken = TokenGenerator.generate();
+            user.setToken(newToken);
+            client.setToken(newToken);
             userDAO.updateUser(user);
             return "redirect:" + ViewsEnum.PROFILE + ViewsEnum.EXTENSION;
         } else {
