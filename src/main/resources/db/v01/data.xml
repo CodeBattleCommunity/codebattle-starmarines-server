@@ -104,4 +104,15 @@
             <column name="DESCRIPTION">Линк на исходники клиентов</column>
         </insert>
     </changeSet>
+
+    <changeSet id="decrease_disaster_factors" author="Igor_Petrov@epam.com">
+        <update tableName="SETTINGS" >
+            <column name="VAL" value="0.05" />
+            <where>ID = 'LOCAL_DISASTER_PROBABILITY_PER_VERTEX'</where>
+        </update>
+        <update tableName="SETTINGS" >
+            <column name="VAL" value="0.05" />
+            <where>ID = 'INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE'</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>

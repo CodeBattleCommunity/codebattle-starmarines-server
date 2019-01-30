@@ -8,12 +8,10 @@ import java.util.*;
  */
 public enum DisasterType {
 
-    EARTHQUAKE, VOLCANO, METEOR,
+    METEOR,
     BLACK_HOLE;
 
     public static List<DisasterType> LOCAL_DISASTERS = Collections.unmodifiableList(new ArrayList<DisasterType>() {{
-        add(EARTHQUAKE);
-        add(VOLCANO);
         add(METEOR);
     }});
 
