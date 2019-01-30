@@ -91,4 +91,17 @@
             <column name="DESCRIPTION">Кол-во уничтожаемых юнитов при попадании в черную дыру между планет. В % [0-1]</column>
         </insert>
     </changeSet>
+
+    <changeSet id="add_sources_links_for_docs" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="GAME_SOURCES_URL" />
+            <column name="VAL" value="https://github.com/IzhevskCodeBattle/hardcoded-star-marines" />
+            <column name="DESCRIPTION">Линк на исходники игрового сервера</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="GAME_CLIENTS_URL" />
+            <column name="VAL" value="https://github.com/IzhevskCodeBattle/hardcoded-star-marines-clients" />
+            <column name="DESCRIPTION">Линк на исходники клиентов</column>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

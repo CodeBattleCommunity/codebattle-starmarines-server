@@ -101,6 +101,23 @@
       ]
     }
   ],
+  "disasters": [
+    {
+      "type": "BLACK_HOLE",
+      "sourcePlanetId": 9,
+      "targetPlanetId": 7
+    },
+    {
+      "type": "BLACK_HOLE",
+      "sourcePlanetId": 5,
+      "targetPlanetId": 4
+    },
+    {
+      "type": "METEOR",
+      "planetId": 6
+    },
+    // ...
+  ],
   "errors": []
 }
 </pre>
@@ -147,5 +164,5 @@
 <p>Игра завершается, когда на карте остается только один игрок или количество ходов превышает заданный организатором предел. При достижении предела победителем выбирается игрок с максимальным суммарным количеством юнитов на всех его планетах.<p>
 
 <h3 id="example">Пример бота на Java</h3>
-<p>Пример простого бота на Java можно скачать <a href="/downloads/bot.zip">здесь</a>.
-<p>Исходный код на <a href="https://git.epam.com/igor_drozdov/it-week14-hardcoded-starmarines-sample-bot">git.epam.com</a> </p>
+<p>Исходный код клиентов можно найти <a href="${docInfo.gameClientsURL}">здесь</a>.
+<p>Исходный код на <a href="${docInfo.gameSourcesURL}">в git репозитории</a> </p>

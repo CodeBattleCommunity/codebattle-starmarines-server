@@ -2,7 +2,10 @@ package com.epam.game.controller;
 
 import com.epam.game.constants.AttributesEnum;
 import com.epam.game.constants.ViewsEnum;
+import com.epam.game.dao.GameDAO;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -15,10 +18,14 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  */
 @Controller
 @SessionAttributes(value = AttributesEnum.CLIENT)
+@RequiredArgsConstructor
 public class DocumentationController {
+    
+    private final GameDAO gameDAO;
 
     @RequestMapping(value = "/" + ViewsEnum.DOCUMENTATION + ViewsEnum.EXTENSION, method = RequestMethod.GET)
-    public String showInformation() {
+    public String showInformation(Model model) {
+        model.addAttribute("docInfo", gameDAO.getSettings().getDocInfo());
         return ViewsEnum.DOCUMENTATION;
     }
 }
