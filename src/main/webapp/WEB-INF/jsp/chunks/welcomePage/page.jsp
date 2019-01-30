@@ -102,6 +102,9 @@
 			<div class="form-row">
 				<label><spring:message code="label.login.password"/></label>
 				<form:password maxlength="30" id="passwd" path="password" name="passwd"/>
+				<c:if test="${param.error != null}">
+					<span class="errors">Введен неверный логин или пароль</span>
+				</c:if>
 				<form:errors path="password" cssClass="errors"/>
 			</div>
 			<div class="form-row">

@@ -1,6 +1,9 @@
 package com.epam.game.controller;
 
-import com.epam.game.constants.*;
+import com.epam.game.constants.AttributesEnum;
+import com.epam.game.constants.GameState;
+import com.epam.game.constants.GameType;
+import com.epam.game.constants.ViewsEnum;
 import com.epam.game.controller.dtos.GameInfo;
 import com.epam.game.controller.forms.CreateGameForm;
 import com.epam.game.controller.forms.CreateTrainingLevelForm;
@@ -14,8 +17,8 @@ import com.epam.game.domain.Game;
 import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
 import com.epam.game.gamemodel.gamehandler.GameThread;
-import com.epam.game.gamemodel.mapgenerator.MapGenerator;
-import com.epam.game.gamemodel.mapgenerator.impl.TriangleMapGenerator;
+import com.epam.game.gamemodel.map.GalaxyFactory;
+import com.epam.game.gamemodel.map.Galaxy;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.naming.impl.FileRandomNamingHandler;
@@ -74,7 +77,7 @@ public class GameController {
                 CreateGameForm createGameForm = new CreateGameForm();
                 model.addAttribute(AttributesEnum.CREATE_GAME_FORM, createGameForm);
             }
-            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, LevelGenerators.getAvailableGenerators());
+            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, GalaxyFactory.getAvailableGenerators());
         }
 
         Model gameModel = Model.getInstance();
@@ -95,7 +98,7 @@ public class GameController {
                 CreateGameForm createGameForm = new CreateGameForm();
                 model.addAttribute(AttributesEnum.CREATE_GAME_FORM, createGameForm);
             }
-            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, LevelGenerators.getAvailableGenerators());
+            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, GalaxyFactory.getAvailableGenerators());
         } else {
             games = gameModel.getNotStartedTournaments();
         }
@@ -121,7 +124,7 @@ public class GameController {
             CreateGameForm createGameForm = new CreateGameForm();
             model.addAttribute(AttributesEnum.CREATE_GAME_FORM, createGameForm);
         }
-        model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, LevelGenerators.getAvailableGenerators());
+        model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, GalaxyFactory.getAvailableGenerators());
         return ViewsEnum.CREATE_NEW_GAME;
     }
 
@@ -130,7 +133,7 @@ public class GameController {
         User user = userDAO.getUserWith(client.getId());
         this.createGameValidator.validate(createGameForm, result);
         if (result.hasErrors()) {
-            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, LevelGenerators.getAvailableGenerators());
+            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, GalaxyFactory.getAvailableGenerators());
             return showCreateGamePage(client, model);
         }
         Model gameModel = Model.getInstance();
@@ -145,7 +148,7 @@ public class GameController {
         game.setCreatorId(user.getId());
 	    game.setTimeCreated(new Timestamp(System.currentTimeMillis()));
         gameDAO.addGame(game);
-        MapGenerator generator = LevelGenerators.getGenerator(createGameForm.getType());
+        Galaxy generator = GalaxyFactory.createGenerator(createGameForm.getType(), gameDAO.getSettings());
         generator.setNamingHandler(new FileRandomNamingHandler());
         GameInstance newGame = gameModel.createNewGame(generator, id, game.getType(), createGameForm.getTitle(), user);
         if (!admin) {
@@ -328,7 +331,7 @@ public class GameController {
             }
             model.addAttribute(AttributesEnum.MAX_TRAINING_BOTS, gameDAO.getSettings().getMaxPlayers() - 1);
             model.addAttribute(AttributesEnum.TOKEN, user.getToken());
-            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, LevelGenerators.getAvailableGenerators());
+            model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, GalaxyFactory.getAvailableGenerators());
         }
         model.addAttribute(AttributesEnum.GAME, gameToStart);
         return ViewsEnum.TRAINING_LEVEL;
@@ -350,14 +353,14 @@ public class GameController {
         game.setCreatorId(user.getId());
 	    game.setTimeCreated(new Timestamp(System.currentTimeMillis()));
         gameDAO.addGame(game);
-        MapGenerator generator = new TriangleMapGenerator();
+        Galaxy generator = GalaxyFactory.getDefault();
         generator.setNamingHandler(new FileRandomNamingHandler());
         GameInstance gameToStart = Model.getInstance().createNewGame(id, GameType.TRAINING_LEVEL, ViewsEnum.TRAINING_LEVEL, user);
         gameToStart.addPlayer(user);
         if (!GameType.TRAINING_LEVEL.equals(game.getType())) {
             return ViewsEnum.TRAINING_LEVEL;
         }
-        gameToStart.setMapGenerator(LevelGenerators.getGenerator(createTrainingLevelForm.getType()));
+        gameToStart.setGalaxy(GalaxyFactory.createGenerator(createTrainingLevelForm.getType(), gameDAO.getSettings()));
         int i = 0;
         int trueI = 0;
         List<String> trainigBotLogins = gameDAO.getSettings().getTrainigBotLogins();

@@ -1,6 +1,7 @@
 package com.epam.game.gameinfrastructure.requessthandling;
 
 import com.epam.game.domain.User;
+import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Vertex;
 import java.io.IOException;
@@ -85,9 +86,8 @@ public class SocketResponseSender implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (arg instanceof Map && o instanceof GameInstance) {
-            @SuppressWarnings("unchecked")
-            Map<Long, Vertex> vertices = (Map<Long, Vertex>) arg;
+        if (arg instanceof GalaxySnapshot && o instanceof GameInstance) {
+            GalaxySnapshot snapshot = (GalaxySnapshot) arg;
             GameInstance game = (GameInstance) o;
 
             Set<PeerController> pcs = game.getClientsPeers().get(game);
@@ -105,7 +105,7 @@ public class SocketResponseSender implements Observer {
                 }
             });
 
-            String response = commandConverter.buildResponse(vertices, errors);
+            String response = commandConverter.buildResponse(snapshot, errors);
 
             try {
                 sendMessageToAll(game, response);

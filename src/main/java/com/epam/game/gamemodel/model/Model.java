@@ -5,7 +5,7 @@ import com.epam.game.constants.GameType;
 import com.epam.game.dao.GameDAO;
 import com.epam.game.domain.Game;
 import com.epam.game.domain.User;
-import com.epam.game.gamemodel.mapgenerator.MapGenerator;
+import com.epam.game.gamemodel.map.Galaxy;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
 import java.util.concurrent.ConcurrentHashMap;
@@ -120,9 +120,9 @@ public class Model {
         return newGame;
     }
     
-    public GameInstance createNewGame(MapGenerator generator, long id, GameType gameType, String title, User creator) {
+    public GameInstance createNewGame(Galaxy generator, long id, GameType gameType, String title, User creator) {
         GameInstance game = createNewGame(id, gameType, title, creator);
-        game.setMapGenerator(generator);
+        game.setGalaxy(generator);
         return game;
     }
 

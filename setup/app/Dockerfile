@@ -5,7 +5,7 @@ RUN rm -rf $APP_HOME/src || return 0
 COPY build.gradle settings.gradle gradlew $APP_HOME
 COPY gradle $APP_HOME/gradle
 COPY src $APP_HOME/src
-RUN ./gradlew clean build
+RUN ./gradlew clean build -xtest
 
 FROM openjdk:8
 ENV ARTIFACT_NAME=hardinv-0.0.1-SNAPSHOT.war

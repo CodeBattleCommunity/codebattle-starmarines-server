@@ -1,12 +1,25 @@
-package com.epam.game.gamemodel.mapgenerator.impl;
+package com.epam.game.gamemodel.map;
 
+import com.epam.game.bot.domain.PlanetType;
+import com.epam.game.domain.DisasterSettings;
 import com.epam.game.domain.User;
-import com.epam.game.gamemodel.mapgenerator.MapGenerator;
+import com.epam.game.gameinfrastructure.commands.server.DisasterInfo;
+import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
+import com.epam.game.gameinfrastructure.commands.server.PlanetInfo;
+import com.epam.game.gamemodel.model.Edge;
 import com.epam.game.gamemodel.model.Point;
 import com.epam.game.gamemodel.model.Vertex;
 import com.epam.game.gamemodel.model.VertexType;
+import com.epam.game.gamemodel.model.disaster.Disaster;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.epam.game.gamemodel.model.disaster.DisasterType.BLACK_HOLE;
+import static com.epam.game.gamemodel.model.disaster.DisasterType.LOCAL_DISASTERS;
+import static java.util.Optional.ofNullable;
 
 /**
  * MapGenerator implementation. It has both default and parametrized
@@ -15,7 +28,8 @@ import java.util.*;
  * @author Evgeny_Tetuhin
  * 
  */
-public class TriangleMapGenerator extends MapGenerator {
+@Slf4j
+public class TriangleGalaxy extends Galaxy {
 
     private long indexer = 0L;
     private int LAYER_WIDTH = 100;
@@ -24,12 +38,24 @@ public class TriangleMapGenerator extends MapGenerator {
 
     private List<VertexType> layerTypes;
 
+    private DisasterSettings disasterSettings;
+
+    private Map<Long, Vertex> vertexes = new HashMap<>();
+
+    private List<Edge> edges = new ArrayList<>();
+
+    private Map<Edge, Disaster> interPlanetDisasters = new HashMap<>();
+
+    private Map<Long, Disaster> localPlanetDisasters = new HashMap<>();
+
+    private Random seed = new Random();
+
     /**
      * Creates generator which makes vertex layers of all VertexTypes
      * sequentially.
      */
-    public TriangleMapGenerator() {
-        this(EnumSet.allOf(VertexType.class));
+    TriangleGalaxy() {
+        this(EnumSet.allOf(VertexType.class), DisasterSettings.DEFAULT);
     }
 
     /**
@@ -38,14 +64,16 @@ public class TriangleMapGenerator extends MapGenerator {
      * 
      * @param layerTypes
      */
-    public TriangleMapGenerator(Collection<VertexType> layerTypes) {
-        this.layerTypes = new LinkedList<VertexType>(layerTypes);
+    TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings) {
+        this.layerTypes = new LinkedList<>(layerTypes);
+        this.disasterSettings = disasterSettings;
     }
 
     @Override
-    public Map<Long, Vertex> generate(Map<Long, User> players) {
+    public void generate(Map<Long, User> players) {
         if (players == null) {
-            return null;
+            this.vertexes = null;
+            return;
         }
         if (players.size() < MINIMAL_PLAYERS_COUNT) {
             throw new IllegalArgumentException("Not enough players to generate a map.");
@@ -53,7 +81,7 @@ public class TriangleMapGenerator extends MapGenerator {
         if (layerTypes.size() < MINIMAL_LAYERS_COUNT) {
             throw new IllegalArgumentException("Not enough layers to generate a map.");
         }
-        Map<Long, Vertex> result = new HashMap<Long, Vertex>();
+        vertexes = new HashMap<>();
         int currentLayerNumber = 0;
         Vertex core = new Vertex(++indexer, layerTypes.get(currentLayerNumber++));
         core.setName(nextName());
@@ -69,19 +97,92 @@ public class TriangleMapGenerator extends MapGenerator {
         }
         List<Vertex> basesLayerList = generateBases(prevLayer, layerTypes.get(currentLayerNumber++), players, LAYER_WIDTH);
         layers.addAll(basesLayerList);
-        result.put(core.getId(), core);
+        vertexes.put(core.getId(), core);
         for (Vertex v : layers) {
-            result.put(v.getId(), v);
+            vertexes.put(v.getId(), v);
         }
+    }
 
-        return result;
+    @Override
+    public GalaxySnapshot makeSnapshot() {
+        List<PlanetInfo> planets = vertexes.values().stream()
+                .map(vertex -> PlanetInfo.builder()
+                        .id(vertex.getId())
+                        .droids(vertex.getUnitsCount())
+                        .owner(ofNullable(vertex.getOwner()).map(User::getUserName).orElse(null))
+                        .type(PlanetType.byName(vertex.getType().toString()))
+                        .neighbours(vertex.getNeighbours().stream().map(Vertex::getId).collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
+        List<DisasterInfo> disasters = makeDisastersSnapshot()
+                .stream()
+                .map(DisasterInfo::of)
+                .collect(Collectors.toList());
+        return new GalaxySnapshot(planets, disasters, new ArrayList<>());
+    }
+
+    @Override
+    public List<Disaster> generateDisasters() {
+        interPlanetDisasters.clear();
+        localPlanetDisasters.clear();
+
+        vertexes.forEach((id, vertex) -> {
+            if (!vertex.isBasePlanet() && vertex.getUnitsCount() > 0 && Math.random() < disasterSettings.getLocalDisasterFactor()) {
+                localPlanetDisasters.put(vertex.getId(), new Disaster<>(LOCAL_DISASTERS.get(seed.nextInt(LOCAL_DISASTERS.size())),
+                        vertex, disasterSettings.getLocalDisasterDamage()));
+            }
+        });
+
+        edges.forEach(edge -> {
+            if (Math.random() < disasterSettings.getInterPlanetDisasterFactor()) {
+                interPlanetDisasters.put(edge, new Disaster<>(BLACK_HOLE, edge, disasterSettings.getInterPlanetDisasterDamage()));
+            }
+        });
+
+        return makeDisastersSnapshot();
+    }
+
+    private List<Disaster> makeDisastersSnapshot() {
+        return Stream.concat(
+                interPlanetDisasters.values().stream(),
+                localPlanetDisasters.values().stream()
+        ).collect(Collectors.toList());
+    }
+
+    @Override
+    public int moveUnits(User player, Vertex from, Vertex to, int unitsCount) throws Exception {
+        Edge moveEdge = Edge.of(from.getId(), to.getId());
+        if (interPlanetDisasters.containsKey(moveEdge)) {
+            unitsCount = interPlanetDisasters.get(moveEdge).calculateUnits(unitsCount);
+        }
+        from.decreaseUnits(unitsCount, false);
+        to.addUnits(player, unitsCount);
+        return unitsCount;
+    }
+
+    @Override
+    public void recalculateVertex(Vertex v) {
+        if (localPlanetDisasters.containsKey(v.getId())) {
+            int damage = localPlanetDisasters.get(v.getId()).calculateUnits(v.getUnitsCount());
+            try {
+                v.decreaseUnits(damage, true);
+            } catch (Exception e) {
+                log.error("Failed to decrease units by disaster", e);
+            }
+        }
+        v.recalculate();
+    }
+
+    @Override
+    public Map<Long, Vertex> getPlanets() {
+        return vertexes;
     }
 
     private List<Vertex> generateBases(List<Vertex> prevLayer, VertexType vertexType, Map<Long, User> players, int width) {
         if (prevLayer == null || vertexType == null || players == null) {
             return null;
         }
-        List<Vertex> result = new LinkedList<Vertex>();
+        List<Vertex> result = new LinkedList<>();
         if (prevLayer.size() % players.size() != 0) {
             throw new IllegalArgumentException("Unable to set bases on the map. Outer layer size should be divisible by number of bases.");
         }
@@ -95,6 +196,7 @@ public class TriangleMapGenerator extends MapGenerator {
         while (i.hasNext()) {
             newBase = new Vertex(++indexer, vertexType);
             newBase.setName(nextName());
+            newBase.setBasePlanet(true);
             try {
                 newBase.addUnits(player.next(), 100);
             } catch (Exception e) {
@@ -104,7 +206,7 @@ public class TriangleMapGenerator extends MapGenerator {
             i.next();
             for (int k = 1; k < linksToPrev; k++) {
                 aVertex = i.next();
-                newBase.interconnect(aVertex);
+                edges.add(newBase.interconnect(aVertex));
                 if (k == linksToPrev / 2) { // it is central underlying vertex.
                     position = aVertex.getPoint().changeDistance(center, width);
                     newBase.setPosition(position);
@@ -118,7 +220,7 @@ public class TriangleMapGenerator extends MapGenerator {
         if (core == null || vertexType == null || verticesInLayer == 0) {
             return null;
         }
-        List<Vertex> result = new LinkedList<Vertex>();
+        List<Vertex> result = new LinkedList<>();
         Vertex prev = null;
         Vertex cur = null;
         Point position = new Point(core.getX(), core.getY());
@@ -127,15 +229,15 @@ public class TriangleMapGenerator extends MapGenerator {
             prev = cur;
             cur = new Vertex(++indexer, vertexType);
             cur.setName(nextName());
-            cur.interconnect(core);
+            edges.add(cur.interconnect(core));
             if (prev != null) {
-                prev.interconnect(cur);
+                edges.add(prev.interconnect(cur));
             }
             cur.setPosition(position);
             result.add(cur);
             position = position.rotateAround(core.getPoint(), Math.PI * 2 / verticesInLayer);
         }
-        result.get(0).interconnect(result.get(result.size() - 1));
+        edges.add(result.get(0).interconnect(result.get(result.size() - 1)));
         return result;
     }
 
@@ -143,7 +245,7 @@ public class TriangleMapGenerator extends MapGenerator {
         if (prevLayer == null || type == null) {
             return null;
         }
-        List<Vertex> result = new LinkedList<Vertex>();
+        List<Vertex> result = new LinkedList<>();
         double rotateAngle = (doubled) ? Math.PI / prevLayer.size() : Math.PI * 2 / prevLayer.size();
         Vertex prevLayerA;
         Vertex prevLayerB;
@@ -160,18 +262,18 @@ public class TriangleMapGenerator extends MapGenerator {
             new1.setPosition(position);
             position = position.rotateAround(center, rotateAngle);
             if (new2 != null) {
-                new1.interconnect(new2);
+                edges.add(new1.interconnect(new2));
             }
-            prevLayerA.interconnect(new1);
+            edges.add(prevLayerA.interconnect(new1));
             result.add(new1);
             if (doubled) {
                 new2 = new Vertex(++indexer, type);
                 new2.setName(nextName());
                 new2.setPosition(position);
-                new2.interconnect(new1);
+                edges.add(new2.interconnect(new1));
                 position = position.rotateAround(center, rotateAngle);
-                prevLayerA.interconnect(new2);
-                prevLayerB.interconnect(new2);
+                edges.add(prevLayerA.interconnect(new2));
+                edges.add(prevLayerB.interconnect(new2));
                 result.add(new2);
             } else {
                 new2 = new1; // new2 is set only to connect with a next
@@ -179,7 +281,7 @@ public class TriangleMapGenerator extends MapGenerator {
             }
             prevLayerA = prevLayerB;
         }
-        new2.interconnect(result.get(0));
+        edges.add(new2.interconnect(result.get(0)));
         return result;
     }
     
