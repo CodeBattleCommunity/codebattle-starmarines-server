@@ -14,6 +14,7 @@ import com.epam.game.gamemodel.model.events.GameAbandoned;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinished;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -95,7 +96,7 @@ public class GameInstance extends Observable {
 
 	@Getter
     @Setter
-    private Map<GameInstance, Set<PeerController>> clientsPeers = new HashMap<>();
+    private Map<GameInstance, Set<PeerController>> clientsPeers = new ConcurrentHashMap<>();
 
 	public GameInstance(long id, GameType type, GameSettings gameSettings, User creator) {
 		this.players = new HashMap<>();
