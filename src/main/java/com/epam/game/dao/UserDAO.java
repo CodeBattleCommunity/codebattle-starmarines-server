@@ -59,7 +59,7 @@ public class UserDAO {
     }
 
     public void addUser(User user) {
-        jdbcTemplate.update("INSERT INTO USERS (USER_NAME, LOGIN, PASSWORD,  TOKEN, EMAIL) VALUES(?, ?, ?, uuid_generate_v4(), ?)",
+        jdbcTemplate.update("INSERT INTO USERS (USER_NAME, LOGIN, PASSWORD, EMAIL) VALUES(?, ?, ?, ?)",
                 user.getUserName(), user.getLogin(), user.getPassword(), user.getEmail());
         User userFromDB = getUserWith(user.getLogin(), user.getPassword());
         if (userFromDB != null) {
