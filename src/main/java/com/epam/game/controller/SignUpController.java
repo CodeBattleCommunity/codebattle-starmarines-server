@@ -1,6 +1,5 @@
 package com.epam.game.controller;
 
-import com.epam.game.authorization.TokenGenerator;
 import com.epam.game.constants.AttributesEnum;
 import com.epam.game.constants.ViewsEnum;
 import com.epam.game.controller.forms.SignUpForm;
@@ -9,6 +8,8 @@ import com.epam.game.dao.GameDAO;
 import com.epam.game.dao.UserDAO;
 import com.epam.game.domain.Authority;
 import com.epam.game.domain.User;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,9 +25,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Controller for working with Sign Up page
@@ -76,7 +74,6 @@ public class SignUpController {
         userToDB.setAuthorities(authorities);
         userToDB.setLogin(signUpForm.getName());
         userToDB.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
-        userToDB.setToken(TokenGenerator.generate());
         userToDB.setUserName(signUpForm.getName());
         userToDB.setEmail(signUpForm.getEmail());
         userToDB.setPhone(signUpForm.getPhone());

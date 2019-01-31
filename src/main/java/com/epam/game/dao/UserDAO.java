@@ -59,8 +59,8 @@ public class UserDAO {
     }
 
     public void addUser(User user) {
-        jdbcTemplate.update("INSERT INTO USERS (USER_NAME, LOGIN, PASSWORD,  TOKEN, EMAIL) VALUES(?, ?, ?, ?, ?)",
-                user.getUserName(), user.getLogin(), user.getPassword(), user.getToken(), user.getEmail());
+        jdbcTemplate.update("INSERT INTO USERS (USER_NAME, LOGIN, PASSWORD,  TOKEN, EMAIL) VALUES(?, ?, ?, uuid_generate_v4(), ?)",
+                user.getUserName(), user.getLogin(), user.getPassword(), user.getEmail());
         User userFromDB = getUserWith(user.getLogin(), user.getPassword());
         if (userFromDB != null) {
             for (GrantedAuthority authority : user.getAuthorities()) {
@@ -72,6 +72,11 @@ public class UserDAO {
     public void updateUser(User user) {
         jdbcTemplate.update("UPDATE USERS SET USER_NAME = ?, LOGIN = ?, PASSWORD = ?, TOKEN = ?, EMAIL = ? WHERE ID = ?",
                 user.getUserName(), user.getLogin(), user.getPassword(), user.getToken(), user.getEmail(), user.getId());
+    }
+
+    public String updateToken(long id) {
+        return jdbcTemplate.queryForObject("UPDATE USERS SET TOKEN = uuid_generate_v4() WHERE ID = ? RETURNING token",
+                new Object[] {id}, (rs, rowNum) -> rs.getString("token"));
     }
 
     private List<GrantedAuthority> getUserAuthorities(Long userId) {

@@ -1,6 +1,5 @@
 package com.epam.game.controller;
 
-import com.epam.game.authorization.TokenGenerator;
 import com.epam.game.constants.AttributesEnum;
 import com.epam.game.constants.ViewsEnum;
 import com.epam.game.controller.forms.ProfileForm;
@@ -87,10 +86,8 @@ public class ProfileController {
         GameInstance game = gameModel.getByUser(client.getId());
         if (game == null) {
             User user = userDAO.getUserWith(client.getId());
-            String newToken = TokenGenerator.generate();
-            user.setToken(newToken);
-            client.setToken(newToken);
-            userDAO.updateUser(user);
+            String token = userDAO.updateToken(user.getId());
+            client.setToken(token);
             return "redirect:" + ViewsEnum.PROFILE + ViewsEnum.EXTENSION;
         } else {
             model.addAttribute(AttributesEnum.ERROR_TOKEN,
