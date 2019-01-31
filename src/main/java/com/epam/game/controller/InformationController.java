@@ -3,6 +3,7 @@ package com.epam.game.controller;
 import com.epam.game.constants.AttributesEnum;
 import com.epam.game.constants.ViewsEnum;
 import com.epam.game.dao.GameDAO;
+import com.epam.game.domain.GameSettings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +26,9 @@ public class InformationController {
 
     @RequestMapping(value = "/" + ViewsEnum.INFO_PAGE + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showInformation(Model model) {
-        model.addAttribute("docInfo", gameDAO.getSettings().getDocInfo());
+        GameSettings settings = gameDAO.getSettings();
+        model.addAttribute("docInfo", settings.getDocInfo());
+        model.addAttribute("disasterSettings", settings.getDisasterSettings());
         return ViewsEnum.INFO_PAGE;
     }
 }
