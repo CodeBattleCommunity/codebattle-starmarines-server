@@ -6,16 +6,21 @@
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-  <changeSet id="add_portal_settings" author="Daniil_Nasretdinov@epam.com">
+  <changeSet id="add_portal_settings_0" author="Daniil_Nasretdinov@epam.com">
     <insert tableName="SETTINGS">
-      <column name="ID" value="OPEN_PORTAL_FOR_TICK" />
+      <column name="ID" value="PORTAL_OPENING_PROBABILITY" />
       <column name="VAL" value="0.10" />
       <column name="DESCRIPTION">Вероятность возникновения портала за тик</column>
     </insert>
     <insert tableName="SETTINGS">
-      <column name="ID" value="PLANET_QUANTITY" />
+      <column name="ID" value="PORTAL_OPENING_FACTOR_BY_PLANETS" />
       <column name="VAL" value="0.20" />
-      <column name="DESCRIPTION">Вероятность возникновения портала от количества планет</column>
+      <column name="DESCRIPTION">Максимальное кол-во порталов (в каждый момент времени) в % от кол-ва "стандартных" ребер графа галактики</column>
+    </insert>
+    <insert tableName="SETTINGS">
+      <column name="ID" value="PORTAL_TTL" />
+      <column name="VAL" value="2" />
+      <column name="DESCRIPTION">Кол-во тиков, на протяжении которых портал держится открытым</column>
     </insert>
   </changeSet>
 </databaseChangeLog>

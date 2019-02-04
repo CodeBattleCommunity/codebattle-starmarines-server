@@ -14,12 +14,12 @@ import com.epam.game.gamemodel.model.events.GameAbandoned;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinished;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 /**
@@ -322,8 +322,8 @@ public class GameInstance extends Observable {
             throw new IllegalStateException();
         }
         disasters = galaxy.generateDisasters();
-        portals = galaxy.generatePortals();
         recalculate();
+        portals = galaxy.generatePortals();
         setChanged();
         notifyObservers(galaxy.makeSnapshot());
         lastTurnChanges = currentChanges;
