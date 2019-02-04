@@ -14,10 +14,19 @@ public class Disaster<T> {
     @Getter
     private DisasterType type;
     private T target;
+    private int ttl;
     protected double damageFactor;
 
     public int calculateUnits(int unitsCount) {
         return (int) (unitsCount - (unitsCount * damageFactor));
+    }
+
+    public int countDownTtl() {
+        try {
+            return ttl--;
+        } finally {
+            ttl = ttl < 0 ? 0 : ttl;
+        }
     }
 
     public T getTarget() {
