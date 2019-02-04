@@ -116,6 +116,8 @@ public class GameDAO {
 		LOCAL_DISASTER_DAMAGE(Double::valueOf),
 		INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE(Double::valueOf),
 		INTER_PLANET_DISASTER_DAMAGE(Double::valueOf),
+		OPEN_PORTAL_FOR_TICK(Double::valueOf),
+		PLANET_QUANTITY(Double::valueOf),
 
 		GAME_SOURCES_URL(String::valueOf),
 		GAME_CLIENTS_URL(String::valueOf);
@@ -149,6 +151,11 @@ public class GameDAO {
 					.localDisasterDamage((Double) settings.get(SettingsOption.LOCAL_DISASTER_DAMAGE))
 					.build();
 
+			PortalSettings portalSettings = PortalSettings.builder()
+					.openFactorForTick((Double)settings.get(SettingsOption.OPEN_PORTAL_FOR_TICK))
+					.planetQuantityFactor((Double)settings.get(SettingsOption.PLANET_QUANTITY))
+					.build();
+
 			DocInfo docInfo = DocInfo.builder()
 					.gameSourcesURL((String) settings.get(SettingsOption.GAME_SOURCES_URL))
 					.gameClientsURL((String) settings.get(SettingsOption.GAME_CLIENTS_URL))
@@ -166,6 +173,7 @@ public class GameDAO {
 					.maxPlayers((Integer) settings.get(SettingsOption.MAXIMAL_PLAYERS_NUMBER))
 					.roundTurns((Long) settings.get(SettingsOption.GAME_TURNS_LIMIT))
 					.disasterSettings(disasterSettings)
+					.portalSettings(portalSettings)
 					.docInfo(docInfo)
 					.build();
 		}

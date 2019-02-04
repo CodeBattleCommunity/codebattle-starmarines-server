@@ -2,6 +2,7 @@ package com.epam.game.gamemodel.map;
 
 import com.epam.game.bot.domain.PlanetType;
 import com.epam.game.domain.DisasterSettings;
+import com.epam.game.domain.PortalSettings;
 import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.commands.server.DisasterInfo;
 import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
@@ -40,6 +41,8 @@ public class TriangleGalaxy extends Galaxy {
 
     private DisasterSettings disasterSettings;
 
+    private PortalSettings portalSettings;
+
     private Map<Long, Vertex> vertexes = new HashMap<>();
 
     private List<Edge> edges = new ArrayList<>();
@@ -55,7 +58,7 @@ public class TriangleGalaxy extends Galaxy {
      * sequentially.
      */
     TriangleGalaxy() {
-        this(EnumSet.allOf(VertexType.class), DisasterSettings.DEFAULT);
+        this(EnumSet.allOf(VertexType.class), DisasterSettings.DEFAULT, PortalSettings.DEFAULT);
     }
 
     /**
@@ -64,9 +67,10 @@ public class TriangleGalaxy extends Galaxy {
      * 
      * @param layerTypes
      */
-    TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings) {
+    TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings, PortalSettings portalSettings) {
         this.layerTypes = new LinkedList<>(layerTypes);
         this.disasterSettings = disasterSettings;
+        this.portalSettings = portalSettings;
     }
 
     @Override
@@ -118,7 +122,8 @@ public class TriangleGalaxy extends Galaxy {
                 .stream()
                 .map(DisasterInfo::of)
                 .collect(Collectors.toList());
-        return new GalaxySnapshot(planets, disasters, new ArrayList<>());
+        List<Edge> portals = getPortals();
+        return new GalaxySnapshot(planets, disasters, portals, new ArrayList<>());
     }
 
     @Override
@@ -142,6 +147,41 @@ public class TriangleGalaxy extends Galaxy {
         return makeDisastersSnapshot();
     }
 
+    @Override
+    public List<Edge> generatePortals() {
+        List<Edge> portals = edges.stream().filter(Edge::isPortal).collect(Collectors.toList());
+        for (Edge portal : portals) {
+            vertexes.get(portal.getSource()).getNeighbours().remove(vertexes.get(portal.getTarget()));
+            vertexes.get(portal.getTarget()).getNeighbours().remove(vertexes.get(portal.getSource()));
+        }
+        edges.removeAll(portals);
+
+        Random random = new Random();
+        int planetQuantity = getPlanets().size();
+        int portalQuantity = (int) ((planetQuantity - planetQuantity * portalSettings.getPlanetQuantityFactor())/2);
+        while (portalQuantity > 0) {
+            if (Math.random() < portalSettings.getOpenFactorForTick()) {
+                long fromId = Long.valueOf(random.nextInt(planetQuantity - 2) + 1);
+                Vertex from = getPlanets().get(fromId);
+                long toId = Long.valueOf(random.nextInt(planetQuantity - 2) + 1);
+                Optional<Vertex> vertexOptional = from.getNeighbours().stream().filter(vertex -> vertex.getId() == toId).findFirst();
+                if (!vertexOptional.isPresent() && fromId != toId)  {
+                    edges.add(Edge.of(from.getId(),toId,true));
+                    vertexes.get(fromId).getNeighbours().add(vertexes.get(toId));
+                    vertexes.get(toId).getNeighbours().add(vertexes.get(fromId));
+                } else {
+                    continue;
+                }
+            }
+            portalQuantity--;
+        }
+        return edges.stream().filter(Edge::isPortal).collect(Collectors.toList());
+    }
+
+    private List<Edge> getPortals() {
+        return edges.stream().filter(Edge::isPortal).collect(Collectors.toList());
+    }
+
     private List<Disaster> makeDisastersSnapshot() {
         return Stream.concat(
                 interPlanetDisasters.values().stream(),
@@ -151,7 +191,7 @@ public class TriangleGalaxy extends Galaxy {
 
     @Override
     public int moveUnits(User player, Vertex from, Vertex to, int unitsCount) throws Exception {
-        Edge moveEdge = Edge.of(from.getId(), to.getId());
+        Edge moveEdge = Edge.of(from.getId(), to.getId(),false);
         if (interPlanetDisasters.containsKey(moveEdge)) {
             unitsCount = interPlanetDisasters.get(moveEdge).calculateUnits(unitsCount);
         }

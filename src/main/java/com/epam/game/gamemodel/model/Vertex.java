@@ -76,7 +76,7 @@ public class Vertex {
     public Edge interconnect(Vertex vertex) {
         this.oneWayConnect(vertex);
         vertex.oneWayConnect(this);
-        return new Edge(this.id, vertex.id);
+        return new Edge(this.id, vertex.id, false);
     }
 
     public void setBasePlanet(boolean basePlanet) {

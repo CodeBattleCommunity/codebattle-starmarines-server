@@ -137,6 +137,15 @@ public class JSONConverter {
         }
         result.put("disasters", disastersArray);
 
+        JSONArray portalsArray = new JSONArray();
+        for (Edge p : game.getPortals()) {
+            JSONObject portalObject = new JSONObject();
+            portalObject.put("from",p.getSource());
+            portalObject.put("to",p.getTarget());
+            portalsArray.add(portalObject);
+        }
+        result.put("portals",portalsArray);
+
         playersActions.put("actions", actions);
         result.put("playersActions", playersActions);
         String status = (game.isStarted()) ? (game.isFinished() ? "finished" : "started") : "not started";

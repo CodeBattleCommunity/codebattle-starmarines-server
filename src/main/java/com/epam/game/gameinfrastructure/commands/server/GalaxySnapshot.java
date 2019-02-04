@@ -1,5 +1,6 @@
 package com.epam.game.gameinfrastructure.commands.server;
 
+import com.epam.game.gamemodel.model.Edge;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,8 @@ public class GalaxySnapshot {
     private List<PlanetInfo> planets = new ArrayList<>();
     @Builder.Default
     private List<DisasterInfo> disasters = new ArrayList<>();
+    @Builder.Default
+    private List<Edge> portals = new ArrayList<>();
     @Builder.Default
     private List<String> errors = new ArrayList<>();
 }

@@ -12,8 +12,9 @@ import lombok.Data;
 public class Edge {
     private long source;
     private long target;
+    private boolean portal;
 
-    public static Edge of(long source, long target) {
-        return new Edge(source, target);
+    public static Edge of(long source, long target, boolean portal) {
+        return new Edge(source, target, portal);
     }
 }
