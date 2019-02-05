@@ -1,6 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '2.1.1.RELEASE'
+        lombokVersion = '1.16.20'
     }
     repositories {
         mavenCentral()
@@ -46,8 +47,9 @@ dependencies {
     implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
     implementation 'org.liquibase:liquibase-core'
 
-    compile 'org.projectlombok:lombok:1.16.20'
-
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 //    compile 'org.springframework.security:spring-security-config'
     compile 'org.postgresql:postgresql'
 

@@ -1,15 +1,15 @@
-FROM openjdk:8 AS BUILD
-ENV APP_HOME=/usr/app/
+FROM gradle:jdk8-alpine as BUILD
+ENV APP_HOME=/home/gradle
 WORKDIR $APP_HOME
 RUN rm -rf $APP_HOME/src || return 0
-COPY build.gradle settings.gradle gradlew $APP_HOME
-COPY gradle $APP_HOME/gradle
-COPY src $APP_HOME/src
-RUN ./gradlew clean build -xtest
+COPY --chown=gradle:gradle build.gradle settings.gradle gradlew $APP_HOME/
+COPY --chown=gradle:gradle gradle $APP_HOME/gradle
+COPY --chown=gradle:gradle src $APP_HOME/src
+RUN gradle clean build -xtest --stacktrace
 
 FROM openjdk:8
 ENV ARTIFACT_NAME=hardinv-0.0.1-SNAPSHOT.war
-ENV APP_HOME=/usr/app
+ENV APP_HOME=/home/gradle
 WORKDIR $APP_HOME
 COPY --from=BUILD $APP_HOME/build/libs/$ARTIFACT_NAME /
 EXPOSE 8080
