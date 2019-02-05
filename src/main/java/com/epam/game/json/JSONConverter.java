@@ -140,8 +140,8 @@ public class JSONConverter {
         JSONArray portalsArray = new JSONArray();
         for (Edge p : game.getPortals()) {
             JSONObject portalObject = new JSONObject();
-            portalObject.put("from",p.getSource());
-            portalObject.put("to",p.getTarget());
+            portalObject.put("edgeSourceId",p.getSource());
+            portalObject.put("edgeTargetId",p.getTarget());
             portalsArray.add(portalObject);
         }
         result.put("portals",portalsArray);

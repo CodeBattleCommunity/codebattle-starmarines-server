@@ -11,6 +11,7 @@ public class PortalSettings {
 
   public static PortalSettings DEFAULT = PortalSettings.builder().build();
 
-  private double openFactorForTick;
-  private double planetQuantityFactor;
+  private double portalOpeningProbability;
+  private double portalFactor;
+  private int portalTtl;
 }
