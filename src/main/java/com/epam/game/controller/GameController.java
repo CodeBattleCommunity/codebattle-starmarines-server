@@ -307,11 +307,7 @@ public class GameController {
         Model gameModel = Model.getInstance();
         GameInstance game = gameModel.getGameById(id);
         if (game != null) {
-            Game gameStat = gameDAO.getById(game.getId());
             game.deleteUser(client.getId());
-            if(client.canControlGame(gameStat)){
-                gameModel.deleteGameById(game.getId());
-            }
         }
         return "redirect:" + ViewsEnum.BATTLE + ViewsEnum.EXTENSION;
     }

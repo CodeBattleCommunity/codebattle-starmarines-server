@@ -2,13 +2,16 @@ package com.epam.game.gamemodel.model;
 
 import com.epam.game.bot.main.Bot;
 import com.epam.game.constants.GameType;
+import com.epam.game.domain.DisasterSettings;
 import com.epam.game.domain.GameSettings;
+import com.epam.game.domain.PortalSettings;
 import com.epam.game.domain.User;
 import com.epam.game.exceptions.IllegalCommandException;
 import com.epam.game.exceptions.NotEnoughPlayersException;
 import com.epam.game.gameinfrastructure.requessthandling.PeerController;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
 import com.epam.game.gamemodel.map.Galaxy;
+import com.epam.game.gamemodel.map.TriangleGalaxy;
 import com.epam.game.gamemodel.model.disaster.Disaster;
 import com.epam.game.gamemodel.model.events.GameAbandoned;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
@@ -30,6 +33,7 @@ import java.util.logging.Logger;
  */
 public class GameInstance extends Observable {
 
+
     /**
      * A transfer object to send information about units moving.
      *
@@ -50,8 +54,8 @@ public class GameInstance extends Observable {
             this.count = count;
         }
 
-    }
 
+    }
 	private Logger log = Logger.getLogger(GameInstance.class.getName());
 
 	private Galaxy galaxy;
@@ -84,7 +88,7 @@ public class GameInstance extends Observable {
 
 	private String title;
 
-	private LinkedList<UserScore> statistic;
+	private List<UserScore> statistic;
 
 	private List<GameFinishedListener> finishListeners;
 
@@ -99,6 +103,17 @@ public class GameInstance extends Observable {
 	@Getter
     @Setter
     private Map<GameInstance, Set<PeerController>> clientsPeers = new ConcurrentHashMap<>();
+
+    public GameInstance(long gameId, GameType type, List<UserScore> statistics, Map<Long, User> users) {
+        this.id = gameId;
+        this.type = type;
+        this.statistic = statistics;
+        this.players = users;
+        this.started = true;
+        this.finished = true;
+        this.galaxy = new TriangleGalaxy(new ArrayList<>(), DisasterSettings.builder().build(), PortalSettings.builder().build());
+    }
+
 
 	public GameInstance(long id, GameType type, GameSettings gameSettings, User creator) {
 		this.players = new HashMap<>();
@@ -263,10 +278,9 @@ public class GameInstance extends Observable {
             us.setUser(entry.getKey());
             us.setUnitsCount(entry.getValue());
 	        us.setType(this.getType());
-            this.statistic.addLast(us);
+            this.statistic.add(us);
         }
         this.recalculateScore();
-        System.out.println(statistic.getFirst().getPlace());
     }
     
     /**
@@ -287,6 +301,7 @@ public class GameInstance extends Observable {
         if (players.isEmpty()) {
             this.abandon();
         }
+
     }
 
     /**

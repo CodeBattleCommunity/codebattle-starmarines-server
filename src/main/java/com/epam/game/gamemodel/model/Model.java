@@ -8,7 +8,11 @@ import com.epam.game.domain.User;
 import com.epam.game.gamemodel.map.Galaxy;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -28,6 +32,23 @@ public class Model {
     private Map<Long, GameInstance> games = new ConcurrentHashMap<>();
     private static volatile Model model = new Model();
     private GameDAO gameDAO;
+
+    @PostConstruct
+    public void init() {
+        loadPreviousGames();
+    }
+
+    private void loadPreviousGames() {
+        List<Game> statistics = gameDAO.getStatistics();
+        statistics.forEach(game -> games.put(game.getGameId(), new GameInstance(game.getGameId(), game.getType(), game.getStatistics(), getUsers(game))));
+    }
+
+    private Map<Long, User> getUsers(Game game) {
+        return game.getStatistics()
+                .stream()
+                .map(UserScore::getUser)
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+    }
 
     @Autowired
     public void setGameDAO(GameDAO gameDAO) {
