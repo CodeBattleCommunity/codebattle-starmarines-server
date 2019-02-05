@@ -17,25 +17,30 @@ import com.epam.game.domain.Game;
 import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
 import com.epam.game.gamemodel.gamehandler.GameThread;
-import com.epam.game.gamemodel.map.GalaxyFactory;
 import com.epam.game.gamemodel.map.Galaxy;
+import com.epam.game.gamemodel.map.GalaxyFactory;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.naming.impl.FileRandomNamingHandler;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 /**
  * Controller for working with actions on game and model.
@@ -424,7 +429,7 @@ public class GameController {
             ? gameModel.getAllTournaments()
             : gameModel.getNotStartedGames();
 
-        Map<Long, GameInfo> gamesToShow = new HashMap<Long, GameInfo>(games.size());
+        Map<Long, GameInfo> gamesToShow = new TreeMap<>(Comparator.reverseOrder());
         for(Long gameId : games.keySet()) {
             GameInfo gameInfo = new GameInfo();
             gameInfo.setGameObject(games.get(gameId));
