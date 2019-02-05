@@ -8,6 +8,7 @@ import com.epam.game.domain.User;
 import com.epam.game.gamemodel.map.Galaxy;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -40,6 +41,7 @@ public class Model {
 
     private void loadPreviousGames() {
         List<Game> statistics = gameDAO.getStatistics();
+        statistics.sort(Comparator.comparing(Game::getTimeCreated));
         statistics.forEach(game -> games.put(game.getGameId(), new GameInstance(game.getGameId(), game.getType(), game.getStatistics(), getUsers(game))));
     }
 
