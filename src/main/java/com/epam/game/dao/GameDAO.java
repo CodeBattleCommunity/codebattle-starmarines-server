@@ -113,9 +113,13 @@ public class GameDAO {
 		GAME_TURNS_LIMIT(Long::valueOf),
 		USER_BATTLE_CREATION_ENABLED(Boolean::valueOf),
 		LOCAL_DISASTER_PROBABILITY_PER_VERTEX(Double::valueOf),
+		LOCAL_DISASTER_FACTOR(Double::valueOf),
 		LOCAL_DISASTER_DAMAGE(Double::valueOf),
+		LOCAL_DISASTER_TTL_TICKS(Integer::valueOf),
 		INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE(Double::valueOf),
+		INTER_PLANET_DISASTER_FACTOR(Double::valueOf),
 		INTER_PLANET_DISASTER_DAMAGE(Double::valueOf),
+		INTER_PLANET_DISASTER_TTL_TICKS(Integer::valueOf),
 		PORTAL_OPENING_PROBABILITY(Double::valueOf),
 		PORTAL_OPENING_FACTOR_BY_PLANETS(Double::valueOf),
 		PORTAL_TTL(Integer::valueOf),
@@ -129,7 +133,7 @@ public class GameDAO {
 			return Stream.of(values())
 					.filter(opt -> opt.name().equals(option))
 					.findFirst()
-					.orElseThrow(IllegalArgumentException::new);
+					.orElseThrow(() -> new IllegalArgumentException(String.format("Missing '%s' key in settings", option)));
 		}
 	}
 
@@ -146,10 +150,14 @@ public class GameDAO {
 			} while (rs.next());
 
 			DisasterSettings disasterSettings = DisasterSettings.builder()
-					.interPlanetDisasterFactor((Double) settings.get(SettingsOption.INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE))
+					.interPlanetDisasterProbability((Double) settings.get(SettingsOption.INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE))
+					.interPlanetDisasterFactor((Double) settings.get(SettingsOption.INTER_PLANET_DISASTER_FACTOR))
 					.interPlanetDisasterDamage((Double) settings.get(SettingsOption.INTER_PLANET_DISASTER_DAMAGE))
-					.localDisasterFactor((Double) settings.get(SettingsOption.LOCAL_DISASTER_PROBABILITY_PER_VERTEX))
+					.interPlanetDisasterTtl((Integer) settings.get(SettingsOption.INTER_PLANET_DISASTER_TTL_TICKS))
+					.localDisasterProbability((Double) settings.get(SettingsOption.LOCAL_DISASTER_PROBABILITY_PER_VERTEX))
+					.localDisasterFactor((Double) settings.get(SettingsOption.LOCAL_DISASTER_FACTOR))
 					.localDisasterDamage((Double) settings.get(SettingsOption.LOCAL_DISASTER_DAMAGE))
+					.localDisasterTtl((Integer) settings.get(SettingsOption.LOCAL_DISASTER_TTL_TICKS))
 					.build();
 
 			PortalSettings portalSettings = PortalSettings.builder()

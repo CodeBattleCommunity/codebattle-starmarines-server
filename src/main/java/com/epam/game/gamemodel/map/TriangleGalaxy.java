@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.epam.game.gamemodel.model.disaster.DisasterType.BLACK_HOLE;
-import static com.epam.game.gamemodel.model.disaster.DisasterType.LOCAL_DISASTERS;
+import static com.epam.game.gamemodel.model.disaster.DisasterType.METEOR;
 import static java.util.Optional.ofNullable;
 
 /**
@@ -44,11 +44,15 @@ public class TriangleGalaxy extends Galaxy {
 
     private List<Edge> edges = new ArrayList<>();
 
-    private List<Edge> portals = new ArrayList<>();
-
     private Map<Edge, Disaster> interPlanetDisasters = new HashMap<>();
 
     private Map<Long, Disaster> localPlanetDisasters = new HashMap<>();
+
+    private List<Edge> portals = new ArrayList<>();
+
+    private int maxInterPlanetDisasters;
+
+    private int maxLocalDisasters;
 
     private int maxPortals;
 
@@ -106,6 +110,9 @@ public class TriangleGalaxy extends Galaxy {
         for (Vertex v : layers) {
             vertexes.put(v.getId(), v);
         }
+
+        this.maxInterPlanetDisasters = (int) (disasterSettings.getInterPlanetDisasterFactor() * edges.size());
+        this.maxLocalDisasters = (int) (disasterSettings.getLocalDisasterFactor() * vertexes.size());
         this.maxPortals = (int) (portalSettings.getPortalFactor() * edges.size());
     }
 
@@ -128,21 +135,24 @@ public class TriangleGalaxy extends Galaxy {
         return new GalaxySnapshot(planets, disasters, portals, new ArrayList<>());
     }
 
+    private void cleanupExpiredDisasters(Map<?, Disaster> disasters) {
+        disasters.entrySet().removeIf(disasterEntry -> disasterEntry.getValue().countDownTtl() <= 0);
+    }
+
     @Override
     public List<Disaster> generateDisasters() {
-        interPlanetDisasters.clear();
-        localPlanetDisasters.clear();
+        cleanupExpiredDisasters(interPlanetDisasters);
+        cleanupExpiredDisasters(localPlanetDisasters);
 
         vertexes.forEach((id, vertex) -> {
-            if (!vertex.isBasePlanet() && vertex.getUnitsCount() > 0 && Math.random() < disasterSettings.getLocalDisasterFactor()) {
-                localPlanetDisasters.put(vertex.getId(), new Disaster<>(LOCAL_DISASTERS.get(seed.nextInt(LOCAL_DISASTERS.size())),
-                        vertex, disasterSettings.getLocalDisasterDamage()));
+            if (!vertex.isBasePlanet() && maxLocalDisasters > localPlanetDisasters.size() && Math.random() < disasterSettings.getLocalDisasterProbability()) {
+                localPlanetDisasters.put(vertex.getId(), new Disaster<>(METEOR, vertex, disasterSettings.getLocalDisasterTtl(), disasterSettings.getLocalDisasterDamage()));
             }
         });
 
         edges.forEach(edge -> {
-            if (Math.random() < disasterSettings.getInterPlanetDisasterFactor()) {
-                interPlanetDisasters.put(edge, new Disaster<>(BLACK_HOLE, edge, disasterSettings.getInterPlanetDisasterDamage()));
+            if (maxInterPlanetDisasters > interPlanetDisasters.size() && Math.random() < disasterSettings.getInterPlanetDisasterProbability()) {
+                interPlanetDisasters.put(edge, new Disaster<>(BLACK_HOLE, edge, disasterSettings.getInterPlanetDisasterTtl(), disasterSettings.getInterPlanetDisasterDamage()));
             }
         });
 

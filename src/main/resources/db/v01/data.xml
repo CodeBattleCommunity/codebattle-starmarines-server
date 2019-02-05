@@ -115,4 +115,27 @@
             <where>ID = 'INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE'</where>
         </update>
     </changeSet>
+
+    <changeSet id="add_disasters_ttl" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_FACTOR" />
+            <column name="VAL" value="0.1" />
+            <column name="description" >Максимальное кол-во локальных катастроф (в каждый момент времени) в % от общего кол-ва планет в галактике</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_FACTOR" />
+            <column name="VAL" value="0.1" />
+            <column name="description" >Максимальное кол-во межпланетных катастроф (в каждый момент времени) в % от общего кол-ва ребер графа галактики</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_TTL_TICKS" />
+            <column name="VAL" value="2" />
+            <column name="description" >Кол-во тиков, на протяжении которых сохраняется локальная планетрная катастрофа</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_TTL_TICKS" />
+            <column name="VAL" value="3" />
+            <column name="description" >Кол-во тиков, на протяжении которых сохраняется межпланетарная катастрофа</column>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
