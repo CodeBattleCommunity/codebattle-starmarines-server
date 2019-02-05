@@ -1208,7 +1208,6 @@ var renderBlock = {
 
 
     createTextTexture: function (planetId) {
-
         var canvas = renderBlock.canvases[planetId];
         owner = renderBlock.planets[planetId].owner;
 
@@ -1235,12 +1234,8 @@ var renderBlock = {
 //	    context.font = "normal 46px " + renderBlock.fontFamily;
         context.font = renderType == 'WebGL' ? "normal 42pt Play" : "bold 26pt Play";// + renderBlock.fontFamily;
 //	    context.font += renderBlock.fontFamily;
-
-
-
+        
         context.fillStyle =   renderBlock.getMaterial(owner).color.getContextStyle();
-
-
         context.textAlign = "center";
 
         context.fillText(renderBlock.planets[planetId].unitsCount, canvas.height / 2,  canvas.height /2 - planetSize, canvas.width);
@@ -1370,7 +1365,6 @@ var renderBlock = {
             renderer.setClearColorHex(renderBlock.config.bgColor, 0);
 
             //            renderer.setClearColorHex(0xa6a3a0, 1);
-            
             renderer.setSize(renderBlock.SCREEN_WIDTH, renderBlock.SCREEN_HEIGHT);
             renderer.domElement.style.position = "relative";
             renderBlock.renderer = renderer;
@@ -1418,6 +1412,7 @@ var renderBlock = {
     },
 
     generateStars: function () {
+
         renderBlock.rings = {};
         map = modelBlock.planetMap;
         moons = renderBlock.planets;
@@ -1615,7 +1610,6 @@ var renderBlock = {
 
     init : function() {
         //        console.log("initializing renderBlock...");
-        
         
         renderBlock.SCREEN_WIDTH  = $('#container').outerWidth();//TODO remake to the size of container
         renderBlock.SCREEN_HEIGHT = $('#container').outerHeight();
@@ -2284,7 +2278,6 @@ var renderBlock = {
     fillGLModel: function () {
         //        console.log("filling the render model");
 
-        
         renderBlock.materialDepth = new THREE.MeshDepthMaterial();
         renderBlock.mesh = new THREE.Object3D();
 
@@ -2363,8 +2356,6 @@ var renderBlock = {
                 renderBlock.planets[planet.id] = sun;
                 renderBlock.mesh.add(sun);
             } else {
-
-
                 //                planetMaterial = renderBlock.getMaterial(planet.owner);
                 planetMaterial = new THREE.MeshPhongMaterial({
                     color: 0xffffff,
@@ -2900,6 +2891,7 @@ var renderBlock = {
 
 
     boomIn:function(arrow,delta, pos) {
+
         max = arrow.path.length-1;
         booms = arrow.boomsIn;
         planetSize = renderType == 'WebGL' ? renderBlock.planets[arrow.toId].boundRadius/20 : 1;
@@ -3182,15 +3174,7 @@ var renderBlock = {
 
     },
 
-
-
-
-
-
-
-
     drawTrace: function() {
-
     },
 
 
@@ -3634,6 +3618,7 @@ var loopBlock = {
 
 
     jsonHandler: function(json, xmlhttp) {
+
         //        console.log('\n\nprevTurn: ' + modelBlock.turn + ' newTurn: ' + json.turnNumber );
         modelBlock.turn = json.turnNumber;
         //        modelBlock.prevStep[modelBlock.turn] = modelBlock.planetMap.slice();
@@ -3650,6 +3635,21 @@ var loopBlock = {
             }
 
         }
+        
+        if (json && json.disasters && json.disasters.length > 0) {
+            const disasters = json.disasters;
+            disasters.forEach(element => {
+                if (element.type && element.type === "METEOR") {
+                    renderDisasters.renderPlanetDisaster(element);
+                };
+                if (element.type && element.type === "BLACK_HOLE") {
+                    
+                }
+            });
+        }
+        
+        
+        
         modelBlock.actionMap = json.playersActions.actions;
 
         //        console.log('new turn:' + modelBlock.turn );
@@ -3695,26 +3695,22 @@ var loopBlock = {
                         if(modelBlock.turn != json.turnNumber){
                             loopBlock.jsonHandler(json, xmlhttp);
                             modelBlock.jsonResponse.push(json);
+
                         }
                         break;
                     }
                     case 'finished': {
                         stopTableUpdater();
-                        console.log('hrum hrum');
                         if(!loopBlock.actionsFinished) {
-                            console.log('yup yup');
                             //                            if(modelBlock.turn != json.turnNumber){
-                            console.log('om nom nom');
                             loopBlock.jsonHandler(json, xmlhttp);
                             window.clearInterval(initBlock.actionUpdater);
                             loopBlock.updateActions();
                             modelBlock.turn = json.turnNumber;
                             loopBlock.actionsFinished = true;
-                            console.log('ending');
                         //                            }
 
                         } else {
-                            console.log('ended');
                             window.clearInterval(initBlock.actionUpdater);
 
                             initBlock.notGameStatus(json);
@@ -4033,4 +4029,45 @@ document.onmozfullscreenchange = document.onwebkitfullscreenchange = function() 
         renderBlock.GUIOptions.fullScreen = false;
     }
 };
+
+var renderDisasters = {
+
+    renderPlanetDisaster: (planet) => {
+        
+        console.log(modelBlock.planetMap[planet.planetId - 1]);
+        let planetDis = modelBlock.planetMap[planet.planetId - 1];
+    
+        console.log(planetDis);
+
+        // var planetMaterial = new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808080 + 0x808080, program: renderBlock.programStroke } );
+
+        // var planetMesh = new THREE.Particle(planetMaterial);
+
+        planetMesh.position.x = planetDis.xCoord * 3.0 * 0.6;
+        planetMesh.position.y = planetDis.yCoord * 3.0 * 0.6;
+        planetMesh.position.z = 10;
+
+        // var angle = Math.atan2(planetMesh.position.y, planetMesh.position.x);
+        // angle = renderBlock.correctAngle(angle);
+
+        // var sprite = renderBlock.textGenerator(2, 45);
+        // sprite.scale.x = sprite.scale.y = 1.3/ planetMesh.scale.x;// /2000 ;
+        
+        // sprite.position.x = 0;
+        // sprite.position.z = 0.01;
+        // sprite.position.y = 0;
+        // planetMesh.add(sprite);
+
+        renderBlock.scene.add(sprite);
+        setTimeout(() => {
+            renderBlock.scene.remove(sprite)
+        }, 999);
+
+    }
+}
+
+
+
+
+
 window.onload = chooseRenderType;

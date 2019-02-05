@@ -3,9 +3,9 @@ spring:
     port: 5432
     host: localhost
     driver-class-name: org.postgresql.Driver
-    url: 'jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/hardinv'
+    url: 'jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/postgres'
     username: postgres
-    password: root
+    password: Password25
 
   security:
     user:
