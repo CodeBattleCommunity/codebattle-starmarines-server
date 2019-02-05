@@ -2,6 +2,7 @@ package com.epam.game.gamemodel.map;
 
 import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
+import com.epam.game.gamemodel.model.Edge;
 import com.epam.game.gamemodel.model.Vertex;
 import com.epam.game.gamemodel.model.disaster.Disaster;
 import com.epam.game.gamemodel.naming.NamingHandler;
@@ -39,6 +40,8 @@ public abstract class Galaxy {
     public abstract Map<Long, Vertex> getPlanets();
 
     public abstract List<Disaster> generateDisasters();
+
+    public abstract List<Edge> generatePortals();
 
     public abstract int moveUnits(User player, Vertex from, Vertex to, int unitsCount) throws Exception;
 
