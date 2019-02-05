@@ -37,7 +37,7 @@
                                 </c:choose>
                             </c:if>
                             <c:if test="${isAdmin}">
-                                <a href="gameControl.html?gameId=<c:out value='${g.gameStatistics.gameId}'/>" class="black_button">Управление игрой</a>
+                                <c:if test="${!g.gameObject.finished}"><a href="gameControl.html?gameId=<c:out value='${g.gameStatistics.gameId}'/>" class="black_button">Управление игрой</a></c:if>
                                 <a href="gameBroadcast.html?gameId=<c:out value='${g.gameStatistics.gameId}'/>" class="black_button">Просмотр</a>
                             </c:if>
                         </div>
