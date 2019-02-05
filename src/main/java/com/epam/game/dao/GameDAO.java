@@ -133,7 +133,7 @@ public class GameDAO {
 			return Stream.of(values())
 					.filter(opt -> opt.name().equals(option))
 					.findFirst()
-					.orElseThrow(IllegalArgumentException::new);
+					.orElseThrow(() -> new IllegalArgumentException(String.format("Missing '%s' key in settings", option)));
 		}
 	}
 

@@ -22,11 +22,7 @@ public class Disaster<T> {
     }
 
     public int countDownTtl() {
-        try {
-            return ttl--;
-        } finally {
-            ttl = ttl < 0 ? 0 : ttl;
-        }
+        return --ttl;
     }
 
     public T getTarget() {

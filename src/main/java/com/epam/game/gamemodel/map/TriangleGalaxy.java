@@ -136,7 +136,7 @@ public class TriangleGalaxy extends Galaxy {
     }
 
     private void cleanupExpiredDisasters(Map<?, Disaster> disasters) {
-        disasters.entrySet().removeIf(disasterEntry -> disasterEntry.getValue().countDownTtl() > 0);
+        disasters.entrySet().removeIf(disasterEntry -> disasterEntry.getValue().countDownTtl() <= 0);
     }
 
     @Override
