@@ -8,4 +8,5 @@
   <changeSet id="3" author="maksim_gorbunov@epam.com">
     <addDefaultValue tableName="users" columnName="token" defaultValueComputed="uuid_generate_v4()"/>
   </changeSet>
+  <include file="data.xml" relativeToChangelogFile="true" />
 </databaseChangeLog>
