@@ -20,7 +20,7 @@ public class GalaxyFactory {
     static {
         generators = new HashMap<>();
         generators.put(TRIANGLE_POTENT_BASES, (gameSettings -> {
-            Galaxy g = new TriangleGalaxy(DEFAULT_VERTEX_TYPES, gameSettings.getDisasterSettings());
+            Galaxy g = new TriangleGalaxy(DEFAULT_VERTEX_TYPES, gameSettings.getDisasterSettings(),gameSettings.getPortalSettings());
             g.setNamingHandler(new FileRandomNamingHandler());
             return g;
         }));
@@ -29,7 +29,7 @@ public class GalaxyFactory {
         Collections.reverse(list);
 
         generators.put(TRIANGLE_POTENT_CENTER, gameSettings -> {
-            Galaxy g = new TriangleGalaxy(list, gameSettings.getDisasterSettings());
+            Galaxy g = new TriangleGalaxy(list, gameSettings.getDisasterSettings(),gameSettings.getPortalSettings());
             g.setNamingHandler(new FileRandomNamingHandler());
             return g;
         });

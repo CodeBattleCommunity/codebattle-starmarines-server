@@ -2,14 +2,12 @@ package com.epam.game.gamemodel.map;
 
 import com.epam.game.bot.domain.PlanetType;
 import com.epam.game.domain.DisasterSettings;
+import com.epam.game.domain.PortalSettings;
 import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.commands.server.DisasterInfo;
 import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
 import com.epam.game.gameinfrastructure.commands.server.PlanetInfo;
-import com.epam.game.gamemodel.model.Edge;
-import com.epam.game.gamemodel.model.Point;
-import com.epam.game.gamemodel.model.Vertex;
-import com.epam.game.gamemodel.model.VertexType;
+import com.epam.game.gamemodel.model.*;
 import com.epam.game.gamemodel.model.disaster.Disaster;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,13 +38,19 @@ public class TriangleGalaxy extends Galaxy {
 
     private DisasterSettings disasterSettings;
 
+    private PortalSettings portalSettings;
+
     private Map<Long, Vertex> vertexes = new HashMap<>();
 
     private List<Edge> edges = new ArrayList<>();
 
+    private List<Edge> portals = new ArrayList<>();
+
     private Map<Edge, Disaster> interPlanetDisasters = new HashMap<>();
 
     private Map<Long, Disaster> localPlanetDisasters = new HashMap<>();
+
+    private int maxPortals;
 
     private Random seed = new Random();
 
@@ -55,7 +59,7 @@ public class TriangleGalaxy extends Galaxy {
      * sequentially.
      */
     TriangleGalaxy() {
-        this(EnumSet.allOf(VertexType.class), DisasterSettings.DEFAULT);
+        this(EnumSet.allOf(VertexType.class), DisasterSettings.DEFAULT, PortalSettings.DEFAULT);
     }
 
     /**
@@ -64,9 +68,10 @@ public class TriangleGalaxy extends Galaxy {
      * 
      * @param layerTypes
      */
-    TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings) {
+    TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings, PortalSettings portalSettings) {
         this.layerTypes = new LinkedList<>(layerTypes);
         this.disasterSettings = disasterSettings;
+        this.portalSettings = portalSettings;
     }
 
     @Override
@@ -101,6 +106,7 @@ public class TriangleGalaxy extends Galaxy {
         for (Vertex v : layers) {
             vertexes.put(v.getId(), v);
         }
+        this.maxPortals = (int) (portalSettings.getPortalFactor() * edges.size());
     }
 
     @Override
@@ -118,7 +124,8 @@ public class TriangleGalaxy extends Galaxy {
                 .stream()
                 .map(DisasterInfo::of)
                 .collect(Collectors.toList());
-        return new GalaxySnapshot(planets, disasters, new ArrayList<>());
+        List<Edge> portals = getPortals();
+        return new GalaxySnapshot(planets, disasters, portals, new ArrayList<>());
     }
 
     @Override
@@ -140,6 +147,54 @@ public class TriangleGalaxy extends Galaxy {
         });
 
         return makeDisastersSnapshot();
+    }
+
+    private void cleanupExpiredPortals() {
+        List<Portal> expired = portals.stream()
+                .map(portal -> (Portal) portal)
+                .filter(portal -> portal.countDownTtl() <= 0)
+                .peek(portal -> {
+                    vertexes.get(portal.getSource()).getNeighbours().remove(vertexes.get(portal.getTarget()));
+                    vertexes.get(portal.getTarget()).getNeighbours().remove(vertexes.get(portal.getSource()));
+                })
+                .collect(Collectors.toList());
+        edges.removeAll(expired);
+        portals.removeAll(expired);
+    }
+
+    @Override
+    public List<Edge> generatePortals() {
+        cleanupExpiredPortals();
+        int portalQuantity = portals.size();
+        while (portalQuantity <= maxPortals) {
+            if (Math.random() < portalSettings.getPortalFactor()) {
+                long[] randomPlanetIdsPair = seed.longs(1, vertexes.size())
+                        .distinct()
+                        .filter(value -> vertexes.get(value).getNeighbours().stream().map(Vertex::getId).noneMatch(v -> v == value))
+                        .limit(2)
+                        .toArray();
+
+                if (randomPlanetIdsPair.length < 2) {
+                    continue;
+                }
+
+                long fromId = randomPlanetIdsPair[0];
+                long toId = randomPlanetIdsPair[1];
+
+                Portal portal = Portal.of(fromId, toId, portalSettings.getPortalTtl());
+                portals.add(portal);
+                edges.add(portal);
+                vertexes.get(fromId).getNeighbours().add(vertexes.get(toId));
+                vertexes.get(toId).getNeighbours().add(vertexes.get(fromId));
+            }
+            portalQuantity++;
+        }
+
+        return portals;
+    }
+
+    private List<Edge> getPortals() {
+        return portals;
     }
 
     private List<Disaster> makeDisastersSnapshot() {

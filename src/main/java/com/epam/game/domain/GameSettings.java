@@ -25,5 +25,6 @@ public class GameSettings {
     private long errorDelayMs;
     private int startRowsToShow;
     private DisasterSettings disasterSettings;
+    private PortalSettings portalSettings;
     private DocInfo docInfo;
 }
