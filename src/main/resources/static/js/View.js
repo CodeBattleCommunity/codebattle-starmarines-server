@@ -1207,7 +1207,7 @@ var renderBlock = {
 
 
 
-    createTextTexture: function (planetId) {
+    createTextTexture: function (planetId, hasDisaster) {
         var canvas = renderBlock.canvases[planetId];
         owner = renderBlock.planets[planetId].owner;
 
@@ -1246,18 +1246,27 @@ var renderBlock = {
         //        context.fillText(renderBlock.planets[planetId].name+ ' (' + planetId + ')' , canvas.height / 3,  3* canvas.height / 6,canvas.width);
 
 	    planetSize = renderBlock.getPlanetSize(type)*Math.PI*1.3 -4;
-	     context.fillStyle = "rgba(127,127,127, 0.5)";
+	
 //	    context.lineWidth = 0.03;
 
 
 	    context.moveTo(canvas.height / 2, canvas.height / 2);
-	    context.beginPath();
-	    context.arc( canvas.height / 2, canvas.height / 2, planetSize, Math.PI * 1.5, Math.PI*2*multiplier + Math.PI*1.5, false );
-	    context.lineTo(canvas.height / 2,canvas.height / 2 );
 
-	    context.closePath();
+        if (hasDisaster) {
+            context.beginPath();
+            context.arc(canvas.height / 2, canvas.height / 2, planetSize, 0, Math.PI * 2);
+            context.fillStyle = "rgba(255, 0 ,0, 0.2)";
+            context.fill();
+            context.restore();
+        } else {
+            context.beginPath();
+            context.fillStyle = "rgba(127,127,127, 0.5)";
+            context.arc( canvas.height / 2, canvas.height / 2, planetSize, Math.PI * 1.5, Math.PI*2*multiplier + Math.PI*1.5, false );
+            context.lineTo(canvas.height / 2,canvas.height / 2 );
+            context.fill();
+            context.closePath();
+        }
 
-	    context.fill();
 
 //	    context.stroke();
         return canvas;
@@ -2841,15 +2850,15 @@ var renderBlock = {
 
 
 
-    updateView: function () {//TODO check all this
+    updateView: function (disasters) {//TODO check all this
         // loopBlock.updateModels();
         //        renderBlock.changeMaterials();
 
 
-        renderBlock.updatePlanets();
+        renderBlock.updatePlanets(disasters);
         //        renderBlock.updateUnits();
         
-        renderBlock.updateText();
+        renderBlock.updateText(disasters);
         renderBlock.updateRings();
         res = renderBlock.updateActionMap();
         return res;
@@ -3101,7 +3110,7 @@ var renderBlock = {
 
 
 
-    updatePlanets: function () {
+    updatePlanets: function (disasters) {
         for (id in modelBlock.planetMap) {
             planet = modelBlock.planetMap[id];
             renderBlock.planets[planet.id].owner = planet.owner;
@@ -3114,9 +3123,13 @@ var renderBlock = {
                 renderBlock.getMaterial(planet.owner).color;
 
             } else {
-
                 wireColor = renderBlock.getMaterial(planet.owner).color;
-                renderBlock.planets[planet.id].material.color = renderBlock.getMaterial(planet.owner).color;
+                
+                if (disasters.indexOf(planet.id) !== -1) {
+                    renderBlock.planets[planet.id].material.color = new THREE.Color( 0xff0000 ); 
+                } else {
+                    renderBlock.planets[planet.id].material.color = renderBlock.getMaterial(planet.owner).color;
+                }
 
             }
 
@@ -3470,11 +3483,14 @@ var renderBlock = {
     },
 
 
-    updateText: function () {
+    updateText: function (disasters) {
         system = modelBlock.planetMap;
         for (planet in system) {
-            //            console.log(this);
-            this.createTextTexture(system[planet].id);
+            if (disasters.indexOf(system[planet].id) !== -1) {
+                this.createTextTexture(system[planet].id, true);
+            } else {
+                this.createTextTexture(system[planet].id, false);
+            }
             renderBlock.textures[system[planet].id].needsUpdate = true;
         }
     },
@@ -3635,12 +3651,14 @@ var loopBlock = {
             }
 
         }
+
+        let planetMeteors = [];
         
         if (json && json.disasters && json.disasters.length > 0) {
             const disasters = json.disasters;
             disasters.forEach(element => {
                 if (element.type && element.type === "METEOR") {
-                    renderDisasters.renderPlanetDisaster(element);
+                    planetMeteors.push(element.planetId);
                 };
                 if (element.type && element.type === "BLACK_HOLE") {
                     
@@ -3648,17 +3666,14 @@ var loopBlock = {
             });
         }
         
-        
-        
         modelBlock.actionMap = json.playersActions.actions;
 
-        //        console.log('new turn:' + modelBlock.turn );
-
-        res = renderBlock.updateView();
+        res = renderBlock.updateView(planetMeteors);
 
         if(!res) {
             console.log(xmlhttp.responseText);
         }
+
         modelBlock.updateStats();
 
     },
@@ -4029,45 +4044,6 @@ document.onmozfullscreenchange = document.onwebkitfullscreenchange = function() 
         renderBlock.GUIOptions.fullScreen = false;
     }
 };
-
-var renderDisasters = {
-
-    renderPlanetDisaster: (planet) => {
-        
-        console.log(modelBlock.planetMap[planet.planetId - 1]);
-        let planetDis = modelBlock.planetMap[planet.planetId - 1];
-    
-        console.log(planetDis);
-
-        // var planetMaterial = new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808080 + 0x808080, program: renderBlock.programStroke } );
-
-        // var planetMesh = new THREE.Particle(planetMaterial);
-
-        planetMesh.position.x = planetDis.xCoord * 3.0 * 0.6;
-        planetMesh.position.y = planetDis.yCoord * 3.0 * 0.6;
-        planetMesh.position.z = 10;
-
-        // var angle = Math.atan2(planetMesh.position.y, planetMesh.position.x);
-        // angle = renderBlock.correctAngle(angle);
-
-        // var sprite = renderBlock.textGenerator(2, 45);
-        // sprite.scale.x = sprite.scale.y = 1.3/ planetMesh.scale.x;// /2000 ;
-        
-        // sprite.position.x = 0;
-        // sprite.position.z = 0.01;
-        // sprite.position.y = 0;
-        // planetMesh.add(sprite);
-
-        renderBlock.scene.add(sprite);
-        setTimeout(() => {
-            renderBlock.scene.remove(sprite)
-        }, 999);
-
-    }
-}
-
-
-
 
 
 window.onload = chooseRenderType;
