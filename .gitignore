@@ -26,4 +26,4 @@
 /.nb-gradle/
 
 ### Other stuff ###
-nohup
+nohup.out
