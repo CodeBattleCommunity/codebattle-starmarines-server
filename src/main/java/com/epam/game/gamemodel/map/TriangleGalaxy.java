@@ -1,5 +1,9 @@
 package com.epam.game.gamemodel.map;
 
+import static com.epam.game.gamemodel.model.disaster.DisasterType.BLACK_HOLE;
+import static com.epam.game.gamemodel.model.disaster.DisasterType.METEOR;
+import static java.util.Optional.ofNullable;
+
 import com.epam.game.bot.domain.PlanetType;
 import com.epam.game.domain.DisasterSettings;
 import com.epam.game.domain.PortalSettings;
@@ -7,17 +11,24 @@ import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.commands.server.DisasterInfo;
 import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
 import com.epam.game.gameinfrastructure.commands.server.PlanetInfo;
-import com.epam.game.gamemodel.model.*;
+import com.epam.game.gamemodel.model.Edge;
+import com.epam.game.gamemodel.model.Point;
+import com.epam.game.gamemodel.model.Portal;
+import com.epam.game.gamemodel.model.Vertex;
+import com.epam.game.gamemodel.model.VertexType;
 import com.epam.game.gamemodel.model.disaster.Disaster;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static com.epam.game.gamemodel.model.disaster.DisasterType.BLACK_HOLE;
-import static com.epam.game.gamemodel.model.disaster.DisasterType.METEOR;
-import static java.util.Optional.ofNullable;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * MapGenerator implementation. It has both default and parametrized
@@ -72,7 +83,7 @@ public class TriangleGalaxy extends Galaxy {
      * 
      * @param layerTypes
      */
-    TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings, PortalSettings portalSettings) {
+    public TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings, PortalSettings portalSettings) {
         this.layerTypes = new LinkedList<>(layerTypes);
         this.disasterSettings = disasterSettings;
         this.portalSettings = portalSettings;
