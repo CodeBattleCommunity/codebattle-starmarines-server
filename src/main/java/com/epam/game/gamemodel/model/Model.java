@@ -6,20 +6,17 @@ import com.epam.game.dao.GameDAO;
 import com.epam.game.domain.Game;
 import com.epam.game.domain.User;
 import com.epam.game.gamemodel.map.Galaxy;
+import com.epam.game.gamemodel.map.GalaxyFactory;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
-import java.util.Comparator;
-import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.Resource;
-import java.util.EventObject;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Stores and maintains all game instances.
@@ -42,7 +39,7 @@ public class Model {
     private void loadPreviousGames() {
         List<Game> statistics = gameDAO.getStatistics();
         statistics.sort(Comparator.comparing(Game::getTimeCreated));
-        statistics.forEach(game -> games.put(game.getGameId(), new GameInstance(game.getGameId(), game.getType(), game.getStatistics(), getUsers(game))));
+        statistics.forEach(game -> games.put(game.getGameId(), new GameInstance(game.getGameId(), game.getType(), game.getStatistics(), getUsers(game), GalaxyFactory.getDefault())));
     }
 
     private Map<Long, User> getUsers(Game game) {

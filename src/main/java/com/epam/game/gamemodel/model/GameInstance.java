@@ -2,16 +2,13 @@ package com.epam.game.gamemodel.model;
 
 import com.epam.game.bot.main.Bot;
 import com.epam.game.constants.GameType;
-import com.epam.game.domain.DisasterSettings;
 import com.epam.game.domain.GameSettings;
-import com.epam.game.domain.PortalSettings;
 import com.epam.game.domain.User;
 import com.epam.game.exceptions.IllegalCommandException;
 import com.epam.game.exceptions.NotEnoughPlayersException;
 import com.epam.game.gameinfrastructure.requessthandling.PeerController;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
 import com.epam.game.gamemodel.map.Galaxy;
-import com.epam.game.gamemodel.map.TriangleGalaxy;
 import com.epam.game.gamemodel.model.disaster.Disaster;
 import com.epam.game.gamemodel.model.events.GameAbandoned;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
@@ -19,11 +16,11 @@ import com.epam.game.gamemodel.model.events.GameFinished;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * Represents instance of a game field.
@@ -31,6 +28,7 @@ import java.util.logging.Logger;
  * @author Evgeny_Tetuhin
  * 
  */
+@Slf4j
 public class GameInstance extends Observable {
 
 
@@ -53,10 +51,7 @@ public class GameInstance extends Observable {
             this.to = to;
             this.count = count;
         }
-
-
     }
-	private Logger log = Logger.getLogger(GameInstance.class.getName());
 
 	private Galaxy galaxy;
 
@@ -104,14 +99,16 @@ public class GameInstance extends Observable {
     @Setter
     private Map<GameInstance, Set<PeerController>> clientsPeers = new ConcurrentHashMap<>();
 
-    public GameInstance(long gameId, GameType type, List<UserScore> statistics, Map<Long, User> users) {
+    public GameInstance(long gameId, GameType type, List<UserScore> statistics, Map<Long, User> users, Galaxy galaxy) {
         this.id = gameId;
         this.type = type;
         this.statistic = statistics;
         this.players = users;
         this.started = true;
         this.finished = true;
-        this.galaxy = new TriangleGalaxy(new ArrayList<>(), DisasterSettings.builder().build(), PortalSettings.builder().build());
+        this.galaxy = galaxy;
+        this.finishListeners = new ArrayList<>();
+        this.abandonListeners = new ArrayList<>();
     }
 
 
@@ -560,7 +557,7 @@ public class GameInstance extends Observable {
         for (GameAbandonedListener listener : abandonListeners) {
             listener.afterGameAbandoned(event);
         }
-        System.out.println("The game " + this.id + " successfully abandoned.");
+        log.warn("The game {} successfully abandoned.", this.id);
     }
 
     public LinkedList<UserScore> getStatistics() {
