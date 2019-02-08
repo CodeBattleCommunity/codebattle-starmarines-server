@@ -3503,7 +3503,6 @@ THREE.Object3D.prototype = {
     remove: function ( object ) {
 
         var index = this.children.indexOf( object );
-
         if ( index !== - 1 ) {
 
             object.parent = undefined;
@@ -3522,11 +3521,32 @@ THREE.Object3D.prototype = {
             if ( scene !== undefined && scene instanceof THREE.Scene ) {
 
                 scene.__removeObject( object );
-
             }
 
         }
 
+    },
+
+    removeObject3D: function ( object ) {
+        var index = this.__objects.indexOf( object );
+        var indexChild = this.children[1].children.indexOf( object );
+        if ( index !== - 1 ) {
+
+            object.parent = undefined;
+            this.__objects.splice( index, 1 );
+            this.children[1].children.splice(indexChild, 1);
+            // remove from scene
+
+            var scene = this;
+
+            while ( scene.parent !== undefined ) {
+                scene = scene.parent;
+            }
+
+            if ( scene !== undefined && scene instanceof THREE.Scene ) {
+                scene.__removeObject( object );
+            }
+        }
     },
 
     getChildByName: function ( name, recursive ) {

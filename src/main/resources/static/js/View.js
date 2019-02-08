@@ -1255,7 +1255,7 @@ var renderBlock = {
         if (hasDisaster) {
             context.beginPath();
             context.arc(canvas.height / 2, canvas.height / 2, planetSize, 0, Math.PI * 2);
-            context.fillStyle = "rgba(255, 0 ,0, 0.2)";
+            context.fillStyle = "rgba(255, 0 ,0, 0.6)";
             context.fill();
             context.restore();
         } else {
@@ -1267,12 +1267,7 @@ var renderBlock = {
             context.closePath();
         }
 
-
-//	    context.stroke();
         return canvas;
-
-
-
     },
 
 
@@ -1657,13 +1652,13 @@ var renderBlock = {
         //renderBlock.initMaterials();
 
         renderBlock.addToDocument();
+        renderBlock.addArrows();
 
         try {
             if(renderType == 'WebGL')renderBlock.initGUI(renderBlock.gui, renderBlock.GUIOptions);
         } catch ( e )    {}
         
-        //renderBlock.camera.position.set(-518, 0,0);
-        renderBlock.addArrows();
+        
         for(planet in renderBlock.planets) {
             renderBlock.planets[planet].triggered = renderBlock.GUIOptions.showSelection;
         }
@@ -3168,7 +3163,7 @@ var renderBlock = {
                 if(renderBlock.actionMap[reverseId]){
                     flag = 1.0;
                 }
-                renderBlock.actionMap[id] = renderBlock.arrowBuilder(planet.id, planet.neighbors[i], flag);
+                renderBlock.actionMap[id] = renderBlock.arrowBuilder(planet.id, planet.neighbors[i], flag, false);
                 //                renderBlock.actionMap[id].visible = false;
                 temp =renderBlock.actionMap[planet.id + ' ' + planet.neighbors[i]];
                 //                renderBlock.scene.add(temp);
@@ -3180,10 +3175,6 @@ var renderBlock = {
             //                renderBlock.mesh.add(renderBlock.actionMap[planet.id + ' ' + planet.neighbors[i]]);
             }
         }
-    //        if(renderType == 'WebGL'){
-    //            renderBlock.initComposer(renderBlock.enableFXAA);
-    //        }
-    //        renderBlock.updateText();
 
     },
 
@@ -3191,11 +3182,10 @@ var renderBlock = {
     },
 
 
-    arrowBuilder: function (from, to, up) { //add cases for boundary values
+    arrowBuilder: function (from, to, up, portal) { //add cases for boundary values
         moons = renderBlock.planets;
         var fromVect = moons[from].position; //death on 5 1
         var toVect = moons[to].position;
-
 
         var m = toVect.y - fromVect.y;
         var l = toVect.x - fromVect.x;
@@ -3249,6 +3239,7 @@ var renderBlock = {
             mid,
             arrow.to
             ]);
+
         start = new THREE.Vector2(arrow.from.x, arrow.from.y);
         mid2 = new THREE.Vector2(mid.x, mid.y);
         end = new THREE.Vector2(arrow.to.x, arrow.to.y);
@@ -3274,20 +3265,6 @@ var renderBlock = {
         line = new THREE.Line(geoLine, new THREE.LineBasicMaterial({
             color: 0xaaeeff                    //<- for GL
         }));
-
-	    /*
-	     this.color = new THREE.Color( 0xffffff );
-
-	     this.linewidth = 1;
-	     this.linecap = 'round';
-	     this.linejoin = 'round';
-
-	     this.vertexColors = false;
-
-	     this.fog = true;
-
-	     this.setValues( parameters );
-	    * */
 
 
         var texture;
@@ -3354,13 +3331,24 @@ var renderBlock = {
 	   	var geoLine2 = new THREE.Geometry();
 	    geoLine2.vertices.push(arrow.from);
 	    geoLine2.vertices.push(mid);
-	    geoLine2.vertices.push(arrow.to);
-	    line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas
-//            color: 0x9966FF,
-		    color: 0x9BD3FF,
-		    linewidth:0.3,
-		    vertexColors: true
-	    }));
+        geoLine2.vertices.push(arrow.to);
+
+        
+        if (portal) {
+            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
+                color: 0x0066FF,
+                linewidth: 0.7,
+                vertexColors: true
+            }));
+            line2.name = 'portal';
+        } else {
+            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
+                color: 0x9BD3FF,
+                linewidth: 0.3,
+                vertexColors: true
+            }));
+        }
+        
 
 
         if(renderBlock.showTrace ) {
@@ -3630,11 +3618,13 @@ var loopBlock = {
 
     actionsFinished : false,
     
-
-
-
+    
+    
+    
     jsonHandler: function(json, xmlhttp) {
-
+        let planetMeteors = [];
+        let portals = [];
+        
         //        console.log('\n\nprevTurn: ' + modelBlock.turn + ' newTurn: ' + json.turnNumber );
         modelBlock.turn = json.turnNumber;
         //        modelBlock.prevStep[modelBlock.turn] = modelBlock.planetMap.slice();
@@ -3652,8 +3642,6 @@ var loopBlock = {
 
         }
 
-        let planetMeteors = [];
-        
         if (json && json.disasters && json.disasters.length > 0) {
             const disasters = json.disasters;
             disasters.forEach(element => {
@@ -3663,6 +3651,18 @@ var loopBlock = {
                 if (element.type && element.type === "BLACK_HOLE") {
                     
                 }
+            });
+        }
+
+        if (json && json.portals && json.portals.length > 0) {
+            const portals3 = json.portals;
+            renderBlock.scene.__objects.forEach(item => {
+                if (item.name === 'portal') {
+                    renderBlock.scene.removeObject3D(item);
+                }   
+            })
+            portals3.forEach(item => {
+                renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, true);
             });
         }
         
