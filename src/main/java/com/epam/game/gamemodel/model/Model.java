@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class Model {
 
     private Map<Long, GameInstance> games = new ConcurrentHashMap<>();
+    private Map<Long, GameInstance> gamesHistory = new ConcurrentHashMap<>();
     private static volatile Model model = new Model();
     private GameDAO gameDAO;
 
@@ -39,7 +40,7 @@ public class Model {
     private void loadPreviousGames() {
         List<Game> statistics = gameDAO.getStatistics();
         statistics.sort(Comparator.comparing(Game::getTimeCreated));
-        statistics.forEach(game -> games.put(game.getGameId(), new GameInstance(game.getGameId(), game.getType(), game.getStatistics(), getUsers(game), GalaxyFactory.getDefault())));
+        statistics.forEach(game -> gamesHistory.put(game.getGameId(), new GameInstance(game.getGameId(), game.getType(), game.getStatistics(), getUsers(game), GalaxyFactory.getDefault())));
     }
 
     private Map<Long, User> getUsers(Game game) {
@@ -181,8 +182,14 @@ public class Model {
         games.remove(id);
     }
 
-    public Map<Long, GameInstance> getAllTournaments() {
-        Map<Long, GameInstance> result = new HashMap<Long, GameInstance>();
+    public Map<Long, GameInstance> getAllTournaments(boolean includeFinished) {
+        Map<Long, GameInstance> result = new HashMap<>();
+        Map<Long, GameInstance> games = new HashMap<>(this.games);
+
+        if (includeFinished) {
+            games.putAll(gamesHistory);
+        }
+
         for (Map.Entry<Long, GameInstance> game : games.entrySet()) {
             if (GameType.PLAYER_TOURNAMENT.equals(game.getValue().getType())
                     || GameType.ADMIN_TOURNAMENT.equals(game.getValue().getType())) {

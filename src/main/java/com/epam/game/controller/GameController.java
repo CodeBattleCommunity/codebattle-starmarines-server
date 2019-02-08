@@ -22,25 +22,17 @@ import com.epam.game.gamemodel.map.GalaxyFactory;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.naming.impl.FileRandomNamingHandler;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Controller for working with actions on game and model.
@@ -98,7 +90,7 @@ public class GameController {
         }
         Map<Long, GameInstance> games;
         if (client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())) {
-            games = gameModel.getAllTournaments();
+            games = gameModel.getAllTournaments(true);
             if (!model.containsAttribute(AttributesEnum.CREATE_GAME_FORM)) {
                 CreateGameForm createGameForm = new CreateGameForm();
                 model.addAttribute(AttributesEnum.CREATE_GAME_FORM, createGameForm);
@@ -426,7 +418,7 @@ public class GameController {
         }
 
         Map<Long, GameInstance> games = client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())
-            ? gameModel.getAllTournaments()
+            ? gameModel.getAllTournaments(true)
             : gameModel.getNotStartedGames();
 
         Map<Long, GameInfo> gamesToShow = new TreeMap<>(Comparator.reverseOrder());
