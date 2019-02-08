@@ -1,9 +1,5 @@
 package com.epam.game.gamemodel.map;
 
-import static com.epam.game.gamemodel.model.disaster.DisasterType.BLACK_HOLE;
-import static com.epam.game.gamemodel.model.disaster.DisasterType.METEOR;
-import static java.util.Optional.ofNullable;
-
 import com.epam.game.bot.domain.PlanetType;
 import com.epam.game.domain.DisasterSettings;
 import com.epam.game.domain.PortalSettings;
@@ -11,24 +7,17 @@ import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.commands.server.DisasterInfo;
 import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
 import com.epam.game.gameinfrastructure.commands.server.PlanetInfo;
-import com.epam.game.gamemodel.model.Edge;
-import com.epam.game.gamemodel.model.Point;
-import com.epam.game.gamemodel.model.Portal;
-import com.epam.game.gamemodel.model.Vertex;
-import com.epam.game.gamemodel.model.VertexType;
+import com.epam.game.gamemodel.model.*;
 import com.epam.game.gamemodel.model.disaster.Disaster;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
+
+import static com.epam.game.gamemodel.model.disaster.DisasterType.BLACK_HOLE;
+import static com.epam.game.gamemodel.model.disaster.DisasterType.METEOR;
+import static java.util.Optional.ofNullable;
 
 /**
  * MapGenerator implementation. It has both default and parametrized
@@ -40,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TriangleGalaxy extends Galaxy {
 
+    private static final int MAX_PORTAL_GENERATION_ATTEMPTS = 5;
     private long indexer = 0L;
     private int LAYER_WIDTH = 100;
     private int MINIMAL_LAYERS_COUNT = 3;
@@ -187,6 +177,7 @@ public class TriangleGalaxy extends Galaxy {
     public List<Edge> generatePortals() {
         cleanupExpiredPortals();
         int portalQuantity = portals.size();
+        int generationAttempt = 0;
         while (portalQuantity <= maxPortals) {
             if (Math.random() < portalSettings.getPortalFactor()) {
                 long[] randomPlanetIdsPair = seed.longs(1, vertexes.size())
@@ -202,11 +193,19 @@ public class TriangleGalaxy extends Galaxy {
                 long fromId = randomPlanetIdsPair[0];
                 long toId = randomPlanetIdsPair[1];
 
+                if (edges.contains(Edge.of(fromId, toId)) && generationAttempt < MAX_PORTAL_GENERATION_ATTEMPTS) {
+                    generationAttempt++;
+                    portalQuantity--;
+                    continue;
+                }
+
                 Portal portal = Portal.of(fromId, toId, portalSettings.getPortalTtl());
                 portals.add(portal);
                 edges.add(portal);
                 vertexes.get(fromId).getNeighbours().add(vertexes.get(toId));
                 vertexes.get(toId).getNeighbours().add(vertexes.get(fromId));
+
+                generationAttempt = 0;
             }
             portalQuantity++;
         }
