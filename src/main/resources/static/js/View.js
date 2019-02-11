@@ -2845,12 +2845,12 @@ var renderBlock = {
 
 
 
-    updateView: function (disasters) {//TODO check all this
+    updateView: function (disasters, portals) {//TODO check all this
         // loopBlock.updateModels();
         //        renderBlock.changeMaterials();
 
 
-        renderBlock.updatePlanets(disasters);
+        renderBlock.updatePlanets(disasters, portals);
         //        renderBlock.updateUnits();
         
         renderBlock.updateText(disasters);
@@ -3105,7 +3105,7 @@ var renderBlock = {
 
 
 
-    updatePlanets: function (disasters) {
+    updatePlanets: function (disasters, portals) {
         for (id in modelBlock.planetMap) {
             planet = modelBlock.planetMap[id];
             renderBlock.planets[planet.id].owner = planet.owner;
@@ -3120,8 +3120,11 @@ var renderBlock = {
             } else {
                 wireColor = renderBlock.getMaterial(planet.owner).color;
                 
-                if (disasters.indexOf(planet.id) !== -1) {
-                    renderBlock.planets[planet.id].material.color = new THREE.Color( 0xff0000 ); 
+
+                if (portals.indexOf(planet.id) !== -1) {
+                    renderBlock.planets[planet.id].material.color = new THREE.Color( 0xFFFFFF ); 
+                } else if (disasters.indexOf(planet.id) !== -1) {
+                    renderBlock.planets[planet.id].material.color = new THREE.Color( 0xff0000 );
                 } else {
                     renderBlock.planets[planet.id].material.color = renderBlock.getMaterial(planet.owner).color;
                 }
@@ -3336,8 +3339,8 @@ var renderBlock = {
         
         if (portal) {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
-                color: 0x0066FF,
-                linewidth: 0.7,
+                color: 0xFFFFFF,
+                linewidth: 0.9,
                 vertexColors: true
             }));
             line2.name = 'portal';
@@ -3623,7 +3626,7 @@ var loopBlock = {
     
     jsonHandler: function(json, xmlhttp) {
         let planetMeteors = [];
-        let portals = [];
+        let planetPortals = [];
         
         //        console.log('\n\nprevTurn: ' + modelBlock.turn + ' newTurn: ' + json.turnNumber );
         modelBlock.turn = json.turnNumber;
@@ -3655,20 +3658,24 @@ var loopBlock = {
         }
 
         if (json && json.portals && json.portals.length > 0) {
-            const portals3 = json.portals;
+            const portals = json.portals;
+            portals.forEach(port => {
+                planetPortals.push(port.edgeSourceId);
+                planetPortals.push(port.edgeTargetId);
+            })
             renderBlock.scene.__objects.forEach(item => {
                 if (item.name === 'portal') {
                     renderBlock.scene.removeObject3D(item);
                 }   
             })
-            portals3.forEach(item => {
+            portals.forEach(item => {
                 renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, true);
             });
         }
         
         modelBlock.actionMap = json.playersActions.actions;
 
-        res = renderBlock.updateView(planetMeteors);
+        res = renderBlock.updateView(planetMeteors, planetPortals);
 
         if(!res) {
             console.log(xmlhttp.responseText);
