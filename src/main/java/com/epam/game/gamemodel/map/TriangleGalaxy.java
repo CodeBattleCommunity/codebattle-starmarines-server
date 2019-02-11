@@ -29,6 +29,7 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 public class TriangleGalaxy extends Galaxy {
 
+    private static final int MAX_PORTAL_GENERATION_ATTEMPTS = 5;
     private long indexer = 0L;
     private int LAYER_WIDTH = 100;
     private int MINIMAL_LAYERS_COUNT = 3;
@@ -72,7 +73,7 @@ public class TriangleGalaxy extends Galaxy {
      * 
      * @param layerTypes
      */
-    TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings, PortalSettings portalSettings) {
+    public TriangleGalaxy(Collection<VertexType> layerTypes, DisasterSettings disasterSettings, PortalSettings portalSettings) {
         this.layerTypes = new LinkedList<>(layerTypes);
         this.disasterSettings = disasterSettings;
         this.portalSettings = portalSettings;
@@ -176,6 +177,7 @@ public class TriangleGalaxy extends Galaxy {
     public List<Edge> generatePortals() {
         cleanupExpiredPortals();
         int portalQuantity = portals.size();
+        int generationAttempt = 0;
         while (portalQuantity <= maxPortals) {
             if (Math.random() < portalSettings.getPortalFactor()) {
                 long[] randomPlanetIdsPair = seed.longs(1, vertexes.size())
@@ -191,11 +193,19 @@ public class TriangleGalaxy extends Galaxy {
                 long fromId = randomPlanetIdsPair[0];
                 long toId = randomPlanetIdsPair[1];
 
+                if (edges.contains(Edge.of(fromId, toId)) && generationAttempt < MAX_PORTAL_GENERATION_ATTEMPTS) {
+                    generationAttempt++;
+                    portalQuantity--;
+                    continue;
+                }
+
                 Portal portal = Portal.of(fromId, toId, portalSettings.getPortalTtl());
                 portals.add(portal);
                 edges.add(portal);
                 vertexes.get(fromId).getNeighbours().add(vertexes.get(toId));
                 vertexes.get(toId).getNeighbours().add(vertexes.get(fromId));
+
+                generationAttempt = 0;
             }
             portalQuantity++;
         }

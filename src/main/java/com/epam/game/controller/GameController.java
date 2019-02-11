@@ -17,8 +17,8 @@ import com.epam.game.domain.Game;
 import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
 import com.epam.game.gamemodel.gamehandler.GameThread;
-import com.epam.game.gamemodel.map.GalaxyFactory;
 import com.epam.game.gamemodel.map.Galaxy;
+import com.epam.game.gamemodel.map.GalaxyFactory;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.naming.impl.FileRandomNamingHandler;
@@ -32,10 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Controller for working with actions on game and model.
@@ -93,7 +90,7 @@ public class GameController {
         }
         Map<Long, GameInstance> games;
         if (client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())) {
-            games = gameModel.getAllTournaments();
+            games = gameModel.getAllTournaments(true);
             if (!model.containsAttribute(AttributesEnum.CREATE_GAME_FORM)) {
                 CreateGameForm createGameForm = new CreateGameForm();
                 model.addAttribute(AttributesEnum.CREATE_GAME_FORM, createGameForm);
@@ -307,11 +304,7 @@ public class GameController {
         Model gameModel = Model.getInstance();
         GameInstance game = gameModel.getGameById(id);
         if (game != null) {
-            Game gameStat = gameDAO.getById(game.getId());
             game.deleteUser(client.getId());
-            if(client.canControlGame(gameStat)){
-                gameModel.deleteGameById(game.getId());
-            }
         }
         return "redirect:" + ViewsEnum.BATTLE + ViewsEnum.EXTENSION;
     }
@@ -425,10 +418,10 @@ public class GameController {
         }
 
         Map<Long, GameInstance> games = client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())
-            ? gameModel.getAllTournaments()
+            ? gameModel.getAllTournaments(true)
             : gameModel.getNotStartedGames();
 
-        Map<Long, GameInfo> gamesToShow = new HashMap<Long, GameInfo>(games.size());
+        Map<Long, GameInfo> gamesToShow = new TreeMap<>(Comparator.reverseOrder());
         for(Long gameId : games.keySet()) {
             GameInfo gameInfo = new GameInfo();
             gameInfo.setGameObject(games.get(gameId));

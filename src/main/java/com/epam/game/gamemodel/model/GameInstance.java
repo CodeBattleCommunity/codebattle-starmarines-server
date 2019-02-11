@@ -16,11 +16,11 @@ import com.epam.game.gamemodel.model.events.GameFinished;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 /**
  * Represents instance of a game field.
@@ -28,7 +28,9 @@ import java.util.logging.Logger;
  * @author Evgeny_Tetuhin
  * 
  */
+@Slf4j
 public class GameInstance extends Observable {
+
 
     /**
      * A transfer object to send information about units moving.
@@ -49,10 +51,7 @@ public class GameInstance extends Observable {
             this.to = to;
             this.count = count;
         }
-
     }
-
-	private Logger log = Logger.getLogger(GameInstance.class.getName());
 
 	private Galaxy galaxy;
 
@@ -84,7 +83,7 @@ public class GameInstance extends Observable {
 
 	private String title;
 
-	private LinkedList<UserScore> statistic;
+	private List<UserScore> statistic;
 
 	private List<GameFinishedListener> finishListeners;
 
@@ -99,6 +98,19 @@ public class GameInstance extends Observable {
 	@Getter
     @Setter
     private Map<GameInstance, Set<PeerController>> clientsPeers = new ConcurrentHashMap<>();
+
+    public GameInstance(long gameId, GameType type, List<UserScore> statistics, Map<Long, User> users, Galaxy galaxy) {
+        this.id = gameId;
+        this.type = type;
+        this.statistic = statistics;
+        this.players = users;
+        this.started = true;
+        this.finished = true;
+        this.galaxy = galaxy;
+        this.finishListeners = new ArrayList<>();
+        this.abandonListeners = new ArrayList<>();
+    }
+
 
 	public GameInstance(long id, GameType type, GameSettings gameSettings, User creator) {
 		this.players = new HashMap<>();
@@ -263,10 +275,9 @@ public class GameInstance extends Observable {
             us.setUser(entry.getKey());
             us.setUnitsCount(entry.getValue());
 	        us.setType(this.getType());
-            this.statistic.addLast(us);
+            this.statistic.add(us);
         }
         this.recalculateScore();
-        System.out.println(statistic.getFirst().getPlace());
     }
     
     /**
@@ -287,6 +298,7 @@ public class GameInstance extends Observable {
         if (players.isEmpty()) {
             this.abandon();
         }
+
     }
 
     /**
@@ -545,7 +557,7 @@ public class GameInstance extends Observable {
         for (GameAbandonedListener listener : abandonListeners) {
             listener.afterGameAbandoned(event);
         }
-        System.out.println("The game " + this.id + " successfully abandoned.");
+        log.warn("The game {} successfully abandoned.", this.id);
     }
 
     public LinkedList<UserScore> getStatistics() {

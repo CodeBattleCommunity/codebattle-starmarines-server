@@ -29,6 +29,7 @@ public class DocumentationController {
         GameSettings settings = gameDAO.getSettings();
         model.addAttribute("docInfo", settings.getDocInfo());
         model.addAttribute("disasterSettings", settings.getDisasterSettings());
+        model.addAttribute("portalSettings", settings.getPortalSettings());
         return ViewsEnum.DOCUMENTATION;
     }
 }
