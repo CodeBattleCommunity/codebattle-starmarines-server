@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,8 +31,7 @@ public class CommandConverter {
         return OBJECT_MAPPER.writeValueAsString(galaxySnapshot);
     }
 
-    @SneakyThrows
-    public ClientCommand convertToClientCommand(String str)  {
+    public ClientCommand convertToClientCommand(String str) throws IOException {
         return OBJECT_MAPPER.readValue(str, ClientCommand.class);
     }
 }

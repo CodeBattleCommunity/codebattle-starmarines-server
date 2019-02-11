@@ -10,20 +10,24 @@ import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.model.action.impl.LoginAction;
 import com.epam.game.gamemodel.model.action.impl.MoveAction;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketSession;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketSession;
 
 /**
  * @author Igor_Petrov@epam.com
  * Created at 1/18/2019
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CommandManagerImpl implements CommandManager {
 
@@ -32,8 +36,15 @@ public class CommandManagerImpl implements CommandManager {
     private final Map<String, AtomicLong> activeTokens = new ConcurrentHashMap<>();
 
     @Override
-    public void handleUserCommands(WebSocketSession session, String token, String clientPayload) {
-        ClientCommand clientCommand = commandConverter.convertToClientCommand(clientPayload);
+    public UserSessionState handleUserCommands(WebSocketSession session, String token, String clientPayload) {
+        ClientCommand clientCommand = null;
+        try {
+            clientCommand = commandConverter.convertToClientCommand(clientPayload);
+        } catch (IOException e) {
+            log.error("Invalid command received from client with token: " + token, e);
+            return UserSessionState.invalid(CloseStatus.BAD_DATA, String.format("Invalid json command received from client '%s'." +
+                    " Please fix your client and reconnect", clientPayload));
+        }
 
         GameInstance game = obtainGame(token);
 
@@ -47,6 +58,8 @@ public class CommandManagerImpl implements CommandManager {
         if (game != null) {
             srs.addSocketToGame(game, pc);
         }
+
+        return UserSessionState.valid();
     }
 
     @Override

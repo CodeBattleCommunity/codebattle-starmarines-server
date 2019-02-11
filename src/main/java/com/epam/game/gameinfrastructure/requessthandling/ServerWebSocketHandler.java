@@ -32,7 +32,10 @@ public class ServerWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        commandManager.handleUserCommands(session, extractToken(session), message.getPayload());
+        UserSessionState userSessionState = commandManager.handleUserCommands(session, extractToken(session), message.getPayload());
+        if (!userSessionState.isValid()) {
+            terminateSession(session, userSessionState.getErrorMessage(), userSessionState.getCloseStatus());
+        }
     }
 
     @Override
