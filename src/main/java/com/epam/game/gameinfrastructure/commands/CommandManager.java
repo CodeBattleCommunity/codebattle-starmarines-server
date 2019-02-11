@@ -8,7 +8,7 @@ import org.springframework.web.socket.WebSocketSession;
  * Created at 1/18/2019
  */
 public interface CommandManager {
-    void handleUserCommands(WebSocketSession session, String token, String clientPayload);
+    UserSessionState handleUserCommands(WebSocketSession session, String token, String clientPayload);
 
     UserSessionState handleNewUserConnection(WebSocketSession session, String token);
 

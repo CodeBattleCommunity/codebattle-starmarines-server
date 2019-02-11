@@ -202,8 +202,7 @@ public class TriangleGalaxy extends Galaxy {
                 Portal portal = Portal.of(fromId, toId, portalSettings.getPortalTtl());
                 portals.add(portal);
                 edges.add(portal);
-                vertexes.get(fromId).getNeighbours().add(vertexes.get(toId));
-                vertexes.get(toId).getNeighbours().add(vertexes.get(fromId));
+                vertexes.get(fromId).interconnect(vertexes.get(vertexes.get(toId).getId()));
 
                 generationAttempt = 0;
             }

@@ -1207,8 +1207,7 @@ var renderBlock = {
 
 
 
-    createTextTexture: function (planetId) {
-
+    createTextTexture: function (planetId, hasDisaster) {
         var canvas = renderBlock.canvases[planetId];
         owner = renderBlock.planets[planetId].owner;
 
@@ -1235,12 +1234,8 @@ var renderBlock = {
 //	    context.font = "normal 46px " + renderBlock.fontFamily;
         context.font = renderType == 'WebGL' ? "normal 42pt Play" : "bold 26pt Play";// + renderBlock.fontFamily;
 //	    context.font += renderBlock.fontFamily;
-
-
-
+        
         context.fillStyle =   renderBlock.getMaterial(owner).color.getContextStyle();
-
-
         context.textAlign = "center";
 
         context.fillText(renderBlock.planets[planetId].unitsCount, canvas.height / 2,  canvas.height /2 - planetSize, canvas.width);
@@ -1251,24 +1246,28 @@ var renderBlock = {
         //        context.fillText(renderBlock.planets[planetId].name+ ' (' + planetId + ')' , canvas.height / 3,  3* canvas.height / 6,canvas.width);
 
 	    planetSize = renderBlock.getPlanetSize(type)*Math.PI*1.3 -4;
-	     context.fillStyle = "rgba(127,127,127, 0.5)";
+	
 //	    context.lineWidth = 0.03;
 
 
 	    context.moveTo(canvas.height / 2, canvas.height / 2);
-	    context.beginPath();
-	    context.arc( canvas.height / 2, canvas.height / 2, planetSize, Math.PI * 1.5, Math.PI*2*multiplier + Math.PI*1.5, false );
-	    context.lineTo(canvas.height / 2,canvas.height / 2 );
 
-	    context.closePath();
+        if (hasDisaster) {
+            context.beginPath();
+            context.arc(canvas.height / 2, canvas.height / 2, planetSize, 0, Math.PI * 2);
+            context.fillStyle = "rgba(255, 0 ,0, 0.6)";
+            context.fill();
+            context.restore();
+        } else {
+            context.beginPath();
+            context.fillStyle = "rgba(127,127,127, 0.5)";
+            context.arc( canvas.height / 2, canvas.height / 2, planetSize, Math.PI * 1.5, Math.PI*2*multiplier + Math.PI*1.5, false );
+            context.lineTo(canvas.height / 2,canvas.height / 2 );
+            context.fill();
+            context.closePath();
+        }
 
-	    context.fill();
-
-//	    context.stroke();
         return canvas;
-
-
-
     },
 
 
@@ -1370,7 +1369,6 @@ var renderBlock = {
             renderer.setClearColorHex(renderBlock.config.bgColor, 0);
 
             //            renderer.setClearColorHex(0xa6a3a0, 1);
-            
             renderer.setSize(renderBlock.SCREEN_WIDTH, renderBlock.SCREEN_HEIGHT);
             renderer.domElement.style.position = "relative";
             renderBlock.renderer = renderer;
@@ -1418,6 +1416,7 @@ var renderBlock = {
     },
 
     generateStars: function () {
+
         renderBlock.rings = {};
         map = modelBlock.planetMap;
         moons = renderBlock.planets;
@@ -1616,7 +1615,6 @@ var renderBlock = {
     init : function() {
         //        console.log("initializing renderBlock...");
         
-        
         renderBlock.SCREEN_WIDTH  = $('#container').outerWidth();//TODO remake to the size of container
         renderBlock.SCREEN_HEIGHT = $('#container').outerHeight();
 
@@ -1654,13 +1652,13 @@ var renderBlock = {
         //renderBlock.initMaterials();
 
         renderBlock.addToDocument();
+        renderBlock.addArrows();
 
         try {
             if(renderType == 'WebGL')renderBlock.initGUI(renderBlock.gui, renderBlock.GUIOptions);
         } catch ( e )    {}
         
-        //renderBlock.camera.position.set(-518, 0,0);
-        renderBlock.addArrows();
+        
         for(planet in renderBlock.planets) {
             renderBlock.planets[planet].triggered = renderBlock.GUIOptions.showSelection;
         }
@@ -2284,7 +2282,6 @@ var renderBlock = {
     fillGLModel: function () {
         //        console.log("filling the render model");
 
-        
         renderBlock.materialDepth = new THREE.MeshDepthMaterial();
         renderBlock.mesh = new THREE.Object3D();
 
@@ -2363,8 +2360,6 @@ var renderBlock = {
                 renderBlock.planets[planet.id] = sun;
                 renderBlock.mesh.add(sun);
             } else {
-
-
                 //                planetMaterial = renderBlock.getMaterial(planet.owner);
                 planetMaterial = new THREE.MeshPhongMaterial({
                     color: 0xffffff,
@@ -2850,15 +2845,15 @@ var renderBlock = {
 
 
 
-    updateView: function () {//TODO check all this
+    updateView: function (disasters, portals) {//TODO check all this
         // loopBlock.updateModels();
         //        renderBlock.changeMaterials();
 
 
-        renderBlock.updatePlanets();
+        renderBlock.updatePlanets(disasters, portals);
         //        renderBlock.updateUnits();
         
-        renderBlock.updateText();
+        renderBlock.updateText(disasters);
         renderBlock.updateRings();
         res = renderBlock.updateActionMap();
         return res;
@@ -2900,6 +2895,7 @@ var renderBlock = {
 
 
     boomIn:function(arrow,delta, pos) {
+
         max = arrow.path.length-1;
         booms = arrow.boomsIn;
         planetSize = renderType == 'WebGL' ? renderBlock.planets[arrow.toId].boundRadius/20 : 1;
@@ -3109,7 +3105,7 @@ var renderBlock = {
 
 
 
-    updatePlanets: function () {
+    updatePlanets: function (disasters, portals) {
         for (id in modelBlock.planetMap) {
             planet = modelBlock.planetMap[id];
             renderBlock.planets[planet.id].owner = planet.owner;
@@ -3122,9 +3118,16 @@ var renderBlock = {
                 renderBlock.getMaterial(planet.owner).color;
 
             } else {
-
                 wireColor = renderBlock.getMaterial(planet.owner).color;
-                renderBlock.planets[planet.id].material.color = renderBlock.getMaterial(planet.owner).color;
+                
+
+                if (portals.indexOf(planet.id) !== -1) {
+                    renderBlock.planets[planet.id].material.color = new THREE.Color( 0xFFFFFF ); 
+                } else if (disasters.indexOf(planet.id) !== -1) {
+                    renderBlock.planets[planet.id].material.color = new THREE.Color( 0xff0000 );
+                } else {
+                    renderBlock.planets[planet.id].material.color = renderBlock.getMaterial(planet.owner).color;
+                }
 
             }
 
@@ -3163,7 +3166,7 @@ var renderBlock = {
                 if(renderBlock.actionMap[reverseId]){
                     flag = 1.0;
                 }
-                renderBlock.actionMap[id] = renderBlock.arrowBuilder(planet.id, planet.neighbors[i], flag);
+                renderBlock.actionMap[id] = renderBlock.arrowBuilder(planet.id, planet.neighbors[i], flag, false);
                 //                renderBlock.actionMap[id].visible = false;
                 temp =renderBlock.actionMap[planet.id + ' ' + planet.neighbors[i]];
                 //                renderBlock.scene.add(temp);
@@ -3175,30 +3178,17 @@ var renderBlock = {
             //                renderBlock.mesh.add(renderBlock.actionMap[planet.id + ' ' + planet.neighbors[i]]);
             }
         }
-    //        if(renderType == 'WebGL'){
-    //            renderBlock.initComposer(renderBlock.enableFXAA);
-    //        }
-    //        renderBlock.updateText();
 
     },
-
-
-
-
-
-
-
 
     drawTrace: function() {
-
     },
 
 
-    arrowBuilder: function (from, to, up) { //add cases for boundary values
+    arrowBuilder: function (from, to, up, portal) { //add cases for boundary values
         moons = renderBlock.planets;
         var fromVect = moons[from].position; //death on 5 1
         var toVect = moons[to].position;
-
 
         var m = toVect.y - fromVect.y;
         var l = toVect.x - fromVect.x;
@@ -3252,6 +3242,7 @@ var renderBlock = {
             mid,
             arrow.to
             ]);
+
         start = new THREE.Vector2(arrow.from.x, arrow.from.y);
         mid2 = new THREE.Vector2(mid.x, mid.y);
         end = new THREE.Vector2(arrow.to.x, arrow.to.y);
@@ -3277,20 +3268,6 @@ var renderBlock = {
         line = new THREE.Line(geoLine, new THREE.LineBasicMaterial({
             color: 0xaaeeff                    //<- for GL
         }));
-
-	    /*
-	     this.color = new THREE.Color( 0xffffff );
-
-	     this.linewidth = 1;
-	     this.linecap = 'round';
-	     this.linejoin = 'round';
-
-	     this.vertexColors = false;
-
-	     this.fog = true;
-
-	     this.setValues( parameters );
-	    * */
 
 
         var texture;
@@ -3357,13 +3334,24 @@ var renderBlock = {
 	   	var geoLine2 = new THREE.Geometry();
 	    geoLine2.vertices.push(arrow.from);
 	    geoLine2.vertices.push(mid);
-	    geoLine2.vertices.push(arrow.to);
-	    line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas
-//            color: 0x9966FF,
-		    color: 0x9BD3FF,
-		    linewidth:0.3,
-		    vertexColors: true
-	    }));
+        geoLine2.vertices.push(arrow.to);
+
+        
+        if (portal) {
+            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
+                color: 0xFFFFFF,
+                linewidth: 0.9,
+                vertexColors: true
+            }));
+            line2.name = 'portal';
+        } else {
+            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
+                color: 0x9BD3FF,
+                linewidth: 0.3,
+                vertexColors: true
+            }));
+        }
+        
 
 
         if(renderBlock.showTrace ) {
@@ -3486,11 +3474,14 @@ var renderBlock = {
     },
 
 
-    updateText: function () {
+    updateText: function (disasters) {
         system = modelBlock.planetMap;
         for (planet in system) {
-            //            console.log(this);
-            this.createTextTexture(system[planet].id);
+            if (disasters.indexOf(system[planet].id) !== -1) {
+                this.createTextTexture(system[planet].id, true);
+            } else {
+                this.createTextTexture(system[planet].id, false);
+            }
             renderBlock.textures[system[planet].id].needsUpdate = true;
         }
     },
@@ -3630,10 +3621,13 @@ var loopBlock = {
 
     actionsFinished : false,
     
-
-
-
+    
+    
+    
     jsonHandler: function(json, xmlhttp) {
+        let planetMeteors = [];
+        let planetPortals = [];
+        
         //        console.log('\n\nprevTurn: ' + modelBlock.turn + ' newTurn: ' + json.turnNumber );
         modelBlock.turn = json.turnNumber;
         //        modelBlock.prevStep[modelBlock.turn] = modelBlock.planetMap.slice();
@@ -3650,15 +3644,43 @@ var loopBlock = {
             }
 
         }
+
+        if (json && json.disasters && json.disasters.length > 0) {
+            const disasters = json.disasters;
+            disasters.forEach(element => {
+                if (element.type && element.type === "METEOR") {
+                    planetMeteors.push(element.planetId);
+                };
+                if (element.type && element.type === "BLACK_HOLE") {
+                    
+                }
+            });
+        }
+
+        if (json && json.portals && json.portals.length > 0) {
+            const portals = json.portals;
+            portals.forEach(port => {
+                planetPortals.push(port.edgeSourceId);
+                planetPortals.push(port.edgeTargetId);
+            })
+            renderBlock.scene.__objects.forEach(item => {
+                if (item.name === 'portal') {
+                    renderBlock.scene.removeObject3D(item);
+                }   
+            })
+            portals.forEach(item => {
+                renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, true);
+            });
+        }
+        
         modelBlock.actionMap = json.playersActions.actions;
 
-        //        console.log('new turn:' + modelBlock.turn );
-
-        res = renderBlock.updateView();
+        res = renderBlock.updateView(planetMeteors, planetPortals);
 
         if(!res) {
             console.log(xmlhttp.responseText);
         }
+
         modelBlock.updateStats();
 
     },
@@ -3695,26 +3717,22 @@ var loopBlock = {
                         if(modelBlock.turn != json.turnNumber){
                             loopBlock.jsonHandler(json, xmlhttp);
                             modelBlock.jsonResponse.push(json);
+
                         }
                         break;
                     }
                     case 'finished': {
                         stopTableUpdater();
-                        console.log('hrum hrum');
                         if(!loopBlock.actionsFinished) {
-                            console.log('yup yup');
                             //                            if(modelBlock.turn != json.turnNumber){
-                            console.log('om nom nom');
                             loopBlock.jsonHandler(json, xmlhttp);
                             window.clearInterval(initBlock.actionUpdater);
                             loopBlock.updateActions();
                             modelBlock.turn = json.turnNumber;
                             loopBlock.actionsFinished = true;
-                            console.log('ending');
                         //                            }
 
                         } else {
-                            console.log('ended');
                             window.clearInterval(initBlock.actionUpdater);
 
                             initBlock.notGameStatus(json);
@@ -4033,4 +4051,6 @@ document.onmozfullscreenchange = document.onwebkitfullscreenchange = function() 
         renderBlock.GUIOptions.fullScreen = false;
     }
 };
+
+
 window.onload = chooseRenderType;
