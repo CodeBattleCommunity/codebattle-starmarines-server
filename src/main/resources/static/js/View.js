@@ -3053,6 +3053,8 @@ var renderBlock = {
                 color = renderBlock.getMaterial(owner).color;
                 arrow = renderBlock.actionMap[id];
                 sprites = renderBlock.actionMap[id].children;
+                
+                
                 for(var j = 0; j < sprites.length-1; j++) {
                     sprites[j].visible = true;
 
@@ -3336,22 +3338,21 @@ var renderBlock = {
 	    geoLine2.vertices.push(mid);
         geoLine2.vertices.push(arrow.to);
 
-        
-        if (type === 'portal') {
+        if (type === 'blackhole') {
+            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
+                color: 0x000000,
+                linewidth: 0.9,
+                vertexColors: true
+            }));
+            line2.name = 'blackhole';
+        } else if (type === 'portal') {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
                 color: 0xFFFFFF,
                 linewidth: 0.9,
                 vertexColors: true
             }));
-            line2.name = 'portal';
-        } else if (type === 'blackhole') {
-            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
-                color: 0x000000,
-                linewidth: 1,
-                vertexColors: true
-            }));
-            line2.name = 'blackhole';
-        } else {
+            line2.name = 'portal'
+        } else if (!type) {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
                 color: 0x9BD3FF,
                 linewidth: 0.3,
@@ -3667,25 +3668,31 @@ var loopBlock = {
                 if (item.name === 'blackhole') {
                     renderBlock.scene.removeObject3D(item);
                 }   
-            })
+            });
             blackHoles.forEach(hole => {
-                renderBlock.arrowBuilder(hole.edgeSourceId, hole.edgeTargetId, 1, 'blackhole');
+                if (hole && hole.edgeSourceId && hole.edgeTargetId) {
+                    renderBlock.arrowBuilder(hole.edgeSourceId, hole.edgeTargetId, 1, 'blackhole');
+                }
             });
         }
 
         if (json && json.portals && json.portals.length > 0) {
             const portals = json.portals;
             portals.forEach(port => {
-                planetPortals.push(port.edgeSourceId);
-                planetPortals.push(port.edgeTargetId);
-            })
+                if (port && port.edgeSourceId && port.edgeTargetId) {
+                    planetPortals.push(port.edgeSourceId);
+                    planetPortals.push(port.edgeTargetId);
+                }
+            });
             renderBlock.scene.__objects.forEach(item => {
                 if (item.name === 'portal') {
                     renderBlock.scene.removeObject3D(item);
                 }   
-            })
+            });
             portals.forEach(item => {
-                renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, 'portal');
+                if (item && item.edgeSourceId && item.edgeTargetId) {
+                    renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, 'portal');
+                }
             });
         }
         
