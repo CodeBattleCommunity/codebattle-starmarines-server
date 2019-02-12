@@ -3185,7 +3185,7 @@ var renderBlock = {
     },
 
 
-    arrowBuilder: function (from, to, up, portal) { //add cases for boundary values
+    arrowBuilder: function (from, to, up, type) { //add cases for boundary values
         moons = renderBlock.planets;
         var fromVect = moons[from].position; //death on 5 1
         var toVect = moons[to].position;
@@ -3337,13 +3337,20 @@ var renderBlock = {
         geoLine2.vertices.push(arrow.to);
 
         
-        if (portal) {
+        if (type === 'portal') {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
                 color: 0xFFFFFF,
                 linewidth: 0.9,
                 vertexColors: true
             }));
             line2.name = 'portal';
+        } else if (type === 'blackhole') {
+            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
+                color: 0x000000,
+                linewidth: 1,
+                vertexColors: true
+            }));
+            line2.name = 'blackhole';
         } else {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
                 color: 0x9BD3FF,
@@ -3627,6 +3634,7 @@ var loopBlock = {
     jsonHandler: function(json, xmlhttp) {
         let planetMeteors = [];
         let planetPortals = [];
+        let blackHoles = [];
         
         //        console.log('\n\nprevTurn: ' + modelBlock.turn + ' newTurn: ' + json.turnNumber );
         modelBlock.turn = json.turnNumber;
@@ -3652,8 +3660,16 @@ var loopBlock = {
                     planetMeteors.push(element.planetId);
                 };
                 if (element.type && element.type === "BLACK_HOLE") {
-                    
+                    blackHoles.push(element);
                 }
+            });
+            renderBlock.scene.__objects.forEach(item => {
+                if (item.name === 'blackhole') {
+                    renderBlock.scene.removeObject3D(item);
+                }   
+            })
+            blackHoles.forEach(hole => {
+                renderBlock.arrowBuilder(hole.edgeSourceId, hole.edgeTargetId, 1, 'blackhole');
             });
         }
 
@@ -3669,7 +3685,7 @@ var loopBlock = {
                 }   
             })
             portals.forEach(item => {
-                renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, true);
+                renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, 'portal');
             });
         }
         
