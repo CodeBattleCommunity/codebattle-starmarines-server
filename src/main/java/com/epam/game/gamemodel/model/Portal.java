@@ -1,5 +1,6 @@
 package com.epam.game.gamemodel.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 /**
@@ -11,6 +12,7 @@ import lombok.*;
 @ToString(callSuper = true)
 public class Portal extends Edge {
 
+    @JsonIgnore
     private int ttl;
 
     protected Portal(long source, long target, int ttl) {
