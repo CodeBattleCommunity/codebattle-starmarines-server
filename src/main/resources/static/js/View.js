@@ -3049,7 +3049,7 @@ var renderBlock = {
                         }
                         owner = prevMap[place].owner;
                     }
-                
+
                 color = renderBlock.getMaterial(owner).color;
                 arrow = renderBlock.actionMap[id];
                 sprites = renderBlock.actionMap[id].children;
@@ -3134,6 +3134,15 @@ var renderBlock = {
             }
 
         }
+    },
+
+    updateWaysMap(portals) {
+        portals.forEach(portal => {
+            let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, 'portal'); 
+            renderBlock.actionMap[`${portal.edgeTargetId} ${portal.edgeSourceId}`] = temp;
+            renderBlock.actionMap[`${portal.edgeSourceId} ${portal.edgeTargetId}`] = temp;
+        });
+        renderBlock.newTurn();
     },
 
 
@@ -3678,6 +3687,7 @@ var loopBlock = {
 
         if (json && json.portals && json.portals.length > 0) {
             const portals = json.portals;
+            renderBlock.updateWaysMap(portals);
             portals.forEach(port => {
                 if (port && port.edgeSourceId && port.edgeTargetId) {
                     planetPortals.push(port.edgeSourceId);
@@ -3708,7 +3718,9 @@ var loopBlock = {
 
     },
 
+    updateMap: function (portals) {
 
+    },
 
 
     updateActions: function ( ){
