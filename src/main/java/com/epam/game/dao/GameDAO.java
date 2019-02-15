@@ -122,6 +122,7 @@ public class GameDAO {
 		INTER_PLANET_DISASTER_TTL_TICKS(Integer::valueOf),
 		PORTAL_OPENING_PROBABILITY(Double::valueOf),
 		PORTAL_OPENING_FACTOR_BY_PLANETS(Double::valueOf),
+		PLAYER_ACTIONS_LIMIT_PER_COMMAND(Long::valueOf),
 		PORTAL_TTL(Integer::valueOf),
 
 		GAME_SOURCES_URL(String::valueOf),
@@ -182,6 +183,7 @@ public class GameDAO {
 					.minPlayers((Integer) settings.get(SettingsOption.MINIMAL_PLAYERS_NUMBER))
 					.maxPlayers((Integer) settings.get(SettingsOption.MAXIMAL_PLAYERS_NUMBER))
 					.roundTurns((Long) settings.get(SettingsOption.GAME_TURNS_LIMIT))
+					.playerActionsLimitPerCommand((Long) settings.get(SettingsOption.PLAYER_ACTIONS_LIMIT_PER_COMMAND))
 					.disasterSettings(disasterSettings)
 					.portalSettings(portalSettings)
 					.docInfo(docInfo)
