@@ -176,22 +176,38 @@ public class TriangleGalaxy extends Galaxy {
     @Override
     public List<Edge> generatePortals() {
         cleanupExpiredPortals();
-        List<Vertex> notRagnarsPlanets = vertexes.values().stream()
-                .filter(vertex -> !"Ragnar".equals(ofNullable(vertex.getOwner()).map(User::getUserName).orElse(null)))
-                .collect(Collectors.toList());
+        int portalQuantity = portals.size();
+        int generationAttempt = 0;
+        while (portalQuantity <= maxPortals) {
+            if (Math.random() < portalSettings.getPortalFactor()) {
+                long[] randomPlanetIdsPair = seed.longs(1, vertexes.size())
+                        .distinct()
+                        .filter(value -> vertexes.get(value).getNeighbours().stream().map(Vertex::getId).noneMatch(v -> v == value))
+                        .limit(2)
+                        .toArray();
 
-        vertexes.values().stream()
-                .filter(vertex -> "Ragnar".equals(ofNullable(vertex.getOwner()).map(User::getUserName).orElse(null)))
-                .forEach(ragnarsPlanet -> {
-                    Portal portal = Portal.of(ragnarsPlanet.getId(),1 /* notRagnarsPlanets.get(0).getId() */, portalSettings.getPortalTtl());
-                    if (!portals.contains(portal)) {
-                        portals.add(portal);
-                        edges.add(portal);
-                        vertexes.get(ragnarsPlanet.getId()).interconnect(vertexes.get(notRagnarsPlanets.get(0).getId()));
-                    }
-//                    vertexes.get(ragnarsPlanet.getId()).getNeighbours().add(vertexes.get(notRagnarsPlanets.get(0).getId()));
-//                    vertexes.get(notRagnarsPlanets.get(0).getId()).getNeighbours().add(vertexes.get(ragnarsPlanet.getId()));
-                });
+                if (randomPlanetIdsPair.length < 2) {
+                    continue;
+                }
+
+                long fromId = randomPlanetIdsPair[0];
+                long toId = randomPlanetIdsPair[1];
+
+                if (edges.contains(Edge.of(fromId, toId)) && generationAttempt < MAX_PORTAL_GENERATION_ATTEMPTS) {
+                    generationAttempt++;
+                    portalQuantity--;
+                    continue;
+                }
+
+                Portal portal = Portal.of(fromId, toId, portalSettings.getPortalTtl());
+                portals.add(portal);
+                edges.add(portal);
+                vertexes.get(fromId).interconnect(vertexes.get(vertexes.get(toId).getId()));
+
+                generationAttempt = 0;
+            }
+            portalQuantity++;
+        }
 
         return portals;
     }
