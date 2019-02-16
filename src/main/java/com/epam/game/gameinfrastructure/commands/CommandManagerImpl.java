@@ -13,6 +13,7 @@ import com.epam.game.gamemodel.model.action.impl.LoginAction;
 import com.epam.game.gamemodel.model.action.impl.MoveAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
@@ -38,13 +39,6 @@ public class CommandManagerImpl implements CommandManager {
 
     private final GameDAO gameDAO;
 
-    private long actionsLimitPerCommand;
-
-    @PostConstruct
-    void init() {
-        actionsLimitPerCommand = gameDAO.getSettings().getPlayerActionsLimitPerCommand();
-    }
-
     @Override
     public UserSessionState handleUserCommands(WebSocketSession session, String token, String clientPayload) {
         ClientCommand clientCommand = null;
@@ -55,6 +49,8 @@ public class CommandManagerImpl implements CommandManager {
             return UserSessionState.invalid(CloseStatus.BAD_DATA, String.format("Invalid json command received from client '%s'." +
                     " Please fix your client and reconnect", clientPayload));
         }
+
+        long actionsLimitPerCommand = gameDAO.getSettings().getPlayerActionsLimitPerCommand();
 
         if (clientCommand.getActions() != null && clientCommand.getActions().size() > actionsLimitPerCommand) {
             return UserSessionState.invalid(CloseStatus.TOO_BIG_TO_PROCESS, String.format("Not more than %s actions " +

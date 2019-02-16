@@ -13,7 +13,6 @@ import javax.sql.DataSource;
  * Created at 1/28/2019
  */
 @Configuration
-@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DBConf {
 
     @Bean
