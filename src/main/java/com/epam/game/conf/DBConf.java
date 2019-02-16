@@ -3,6 +3,8 @@ package com.epam.game.conf;
 import liquibase.integration.spring.SpringLiquibase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import javax.sql.DataSource;
 
@@ -11,6 +13,7 @@ import javax.sql.DataSource;
  * Created at 1/28/2019
  */
 @Configuration
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DBConf {
 
     @Bean
