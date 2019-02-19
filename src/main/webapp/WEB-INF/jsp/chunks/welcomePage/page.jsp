@@ -38,47 +38,12 @@
 	<div class="right-align"><a href="info.html">Читать далее...</a></div>
 </div>
 <div class="right-bar opac-black-container">
-	<%--<img id="profits" src="./img/gifts.png" width="252" height="85" alt="Planets" usemap="#planetmap">--%>
-
-	<%--<map name="planetmap">--%>
-		<%--<area shape="rect" coords="0,0,62,85" alt="Pizza" href="#"--%>
-		      <%--title="Порция бесплатной пиццы участникам соревнований">--%>
-		<%--<area shape="rect" coords="63,0,126,85" alt="Coffee" href="#"--%>
-		      <%--title="Безалкогольные напитки участникам соревнований">--%>
-		<%--<area shape="rect" coords="127,0,190,85" alt="Fun" href="#" title="Значки участникам соревнований">--%>
-		<%--<area shape="rect" coords="191,0,285,85" alt="Money" href="#" title="Победитель получает приз">--%>
-	<%--</map>--%>
 
 	<h2 class="yellow-header">Приглашаем принять участие в турнире боевых ботов «Hardcoded StarMarines», который пройдёт в
-		рамках IT Week EPAM.
-	</h2>            <br/>
-	Турнир будет состоять из двух этапов:
-	<ul class="yellow-header large">
-		<li>Отборочные бои, которые состоятся <b>19 августа</b></li>
-		<li>Финал турнира – <b>21 августа</b></li>
-	</ul>
-
-	</p>
-	<p class="red-header">
-
-	<h2 class="red-header">В ходе подготовки к турниру всем участникам представится уникальная возможность
-		протестировать свои программы с помощью тренировочных боёв с дефолтными ботами. Но это еще не все! Уже начиная с
-		11 августа, все зарегистрировавшиеся смогут принять участие в тренировочных боях друг с другом – межпрограммном
-		сражении. <br/><br/>
-
-	<b class="yellow-header large">Лучшую тройку игроков ждут ценные призы от EPAM Systems! Все участники получат специальные
-		бэйджи в профиль UPSA.</b>
-	<br/>
-
-	<p class="large blue">Регистрация на турнир откроется <b>1 августа</b> и продлится <b>до 14 августа 18:00 </b>(МСК).</p>  <br/>
-
-	Следить за финальной битвой смогут все желающие, настроившись на волну EPAM-радио.   <br/>
-	<p class="large blue">Информацию о турнире ищите на странице в KB:</p>
-	<br/>
-	<a class="blue" href="https://epa.ms/hardcodedstarmarinesinfo" target="_blank">https://epa.ms/hardcodedstarmarinesinfo</a>
+		рамках CodeBattle for Students.
 	</h2>
+	<br/>
 
-	<div class="right-align"><a href="info.html#tournament">Подробности здесь...</a></div>
 	<div class="login-ribbon">
 		<c:choose>
 			<c:when test="${pageContext.request.userPrincipal.principal.hasAnyRole('ROLE_USER')}">
