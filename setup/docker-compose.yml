@@ -9,6 +9,7 @@ services:
       - hardinv-net
     ports:
       - '8081:8080'
+      - '8000:8000'
     depends_on:
       - hardinv-db
     environment:
