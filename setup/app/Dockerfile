@@ -13,4 +13,4 @@ ENV APP_HOME=/home/gradle
 WORKDIR $APP_HOME
 COPY --from=BUILD $APP_HOME/build/libs/$ARTIFACT_NAME /
 EXPOSE 8080
-CMD ["java", "-jar", "/hardinv-0.0.1-SNAPSHOT.war"]
+CMD ["java", "-agentlib:jdwp=transport=dt_socket,address=8000,server=y,suspend=n", "-jar", "/hardinv-0.0.1-SNAPSHOT.war"]
