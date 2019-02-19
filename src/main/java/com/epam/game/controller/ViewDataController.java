@@ -45,7 +45,7 @@ public class ViewDataController {
             return;
         }
         RequestType type = RequestType.valueOf(requestType);
-        GameInstance game = Model.getInstance().getGameById(gameId);
+        GameInstance game = Model.getInstance().getGameById(gameId, true);
         if (game == null) {
             return;
         }
