@@ -179,7 +179,7 @@ public class TriangleGalaxy extends Galaxy {
         int portalQuantity = portals.size();
         int generationAttempt = 0;
         while (portalQuantity <= maxPortals) {
-            if (Math.random() < portalSettings.getPortalFactor()) {
+            if (Math.random() < portalSettings.getPortalOpeningProbability()) {
                 long[] randomPlanetIdsPair = seed.longs(1, vertexes.size())
                         .distinct()
                         .filter(value -> vertexes.get(value).getNeighbours().stream().map(Vertex::getId).noneMatch(v -> v == value))
