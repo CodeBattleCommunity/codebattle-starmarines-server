@@ -2971,6 +2971,7 @@ var renderBlock = {
     newTurn: function() {
         //        console.log('clearing the ships');
         map = renderBlock.actionMap;
+
         for(  arw in map) {
 
             arrow = map[arw];
@@ -3010,6 +3011,7 @@ var renderBlock = {
         renderBlock.newTurn();
 
         for(arrow in renderBlock.actionMap) {
+            
             //            renderBlock.actionMap[arrow].countText.visible = false;
             for(var k = 0; k < renderBlock.actionMap[arrow].children.length; k++ ) {
                 renderBlock.actionMap[arrow].children[k].visible = false;
@@ -3054,7 +3056,7 @@ var renderBlock = {
                 arrow = renderBlock.actionMap[id];
                 sprites = renderBlock.actionMap[id].children;
                 
-                
+
                 for(var j = 0; j < sprites.length-1; j++) {
                     sprites[j].visible = true;
 
@@ -3137,12 +3139,19 @@ var renderBlock = {
     },
 
     updateWaysMap(portals) {
+        let prevPortals;
+        renderBlock.actionMap
+
+
+
         portals.forEach(portal => {
-            let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, 'portal'); 
+            let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, false);
+
             renderBlock.actionMap[`${portal.edgeTargetId} ${portal.edgeSourceId}`] = temp;
             renderBlock.actionMap[`${portal.edgeSourceId} ${portal.edgeTargetId}`] = temp;
+            
+
         });
-        renderBlock.newTurn();
     },
 
 
@@ -3163,7 +3172,8 @@ var renderBlock = {
 
     },
 
-    addArrows : function() {
+    addArrows : function() {  
+
         map = modelBlock.planetMap;
         explosions = new THREE.Object3D();
         renderBlock.mesh.add(explosions);
@@ -3211,6 +3221,7 @@ var renderBlock = {
 
         
         var seedsCount = renderType == 'WebGL' ? Math.round(length / 20) : Math.round(length / 80);
+
         var arrow = new THREE.Object3D();
         arrow.from = fromVect;
         arrow.to = toVect;
@@ -3267,7 +3278,7 @@ var renderBlock = {
 
         var points = spline.getPoints( vertexCountDesired );
         var points2 = spline2D.getPoints( Math.floor(vertexCountDesired/20) );
-        //        console.log(points2);
+
         geoLine = new THREE.Geometry();
         geoLine2 = new THREE.Geometry();
         for (var t = 0; t < points.length; t++) {
@@ -3337,11 +3348,14 @@ var renderBlock = {
             if(!renderBlock.isMesh) {
                 temp.visible = false;
             }
+
             arrow.add(temp);
         }
-        
+
         arrow.path = points;
+
         arrow.speed = points.length/30;
+
 	   	var geoLine2 = new THREE.Geometry();
 	    geoLine2.vertices.push(arrow.from);
 	    geoLine2.vertices.push(mid);
@@ -3673,11 +3687,13 @@ var loopBlock = {
                     blackHoles.push(element);
                 }
             });
+            // hide black lines between planets
             renderBlock.scene.__objects.forEach(item => {
                 if (item.name === 'blackhole') {
                     renderBlock.scene.removeObject3D(item);
                 }   
             });
+            // add black lines between planet when blackhole
             blackHoles.forEach(hole => {
                 if (hole && hole.edgeSourceId && hole.edgeTargetId) {
                     renderBlock.arrowBuilder(hole.edgeSourceId, hole.edgeTargetId, 1, 'blackhole');
@@ -3685,40 +3701,52 @@ var loopBlock = {
             });
         }
 
+        renderBlock.scene.__objects.forEach(item => {
+            if (item.name === 'portal') {
+                renderBlock.scene.removeObject3D(item);
+            }   
+        });
+
+        // TODO 
+        // убирать дронов из закрытых порталов
+        for (let item in renderBlock.actionMap) {
+            if (renderBlock.actionMap[item].name  === '1') {
+                delete renderBlock.actionMap[item];
+            }
+        }
+        // renderBlock.actionMap.forEach(item => {
+        //     if (item.name === 'portal') {
+        //         renderBlock.actionMap.removeObject3D(item);
+        //     } 
+        // })
         if (json && json.portals && json.portals.length > 0) {
             const portals = json.portals;
-            renderBlock.updateWaysMap(portals);
+           
             portals.forEach(port => {
                 if (port && port.edgeSourceId && port.edgeTargetId) {
                     planetPortals.push(port.edgeSourceId);
                     planetPortals.push(port.edgeTargetId);
                 }
             });
-            renderBlock.scene.__objects.forEach(item => {
-                if (item.name === 'portal') {
-                    renderBlock.scene.removeObject3D(item);
-                }   
-            });
-            portals.forEach(item => {
-                if (item && item.edgeSourceId && item.edgeTargetId) {
-                    renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, 'portal');
-                }
-            });
+            
+            // portals.forEach(item => {
+                //     if (item && item.edgeSourceId && item.edgeTargetId) {
+                    //         renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, 'portal');
+                    //     } 
+                    // });
+            renderBlock.updateWaysMap(portals);
         }
-        
+                
         modelBlock.actionMap = json.playersActions.actions;
 
-        res = renderBlock.updateView(planetMeteors, planetPortals);
+
+        res = renderBlock.updateView(planetMeteors, planetPortals, blackHoles);
 
         if(!res) {
             console.log(xmlhttp.responseText);
         }
 
         modelBlock.updateStats();
-
-    },
-
-    updateMap: function (portals) {
 
     },
 
