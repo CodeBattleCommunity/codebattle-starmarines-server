@@ -169,7 +169,9 @@ public class GameInstance extends Observable {
         } else {
             try {
                 int unitsMoved = galaxy.moveUnits(player, from, to, unitsCount);
-                currentChanges.add(new Change(vertexId1, vertexId2, unitsMoved));
+                if (unitsCount > 0) {
+                    currentChanges.add(new Change(vertexId1, vertexId2, unitsMoved));
+                }
             } catch (Exception e) {
                 errorMsg = e.getMessage();
             }
