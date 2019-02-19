@@ -226,7 +226,7 @@ public class Vertex {
      */
     public void deleteUsersUnits(User user) {
         challengers.remove(user);
-        if(user.equals(owner)){
+        if(user != null && user.equals(owner)){
             ownersUnitsOutcome = 0;
             ownersUnitsCount = 0;
             owner = null;
