@@ -222,4 +222,4 @@
 
 <h3 id="example">Пример бота на Java</h3>
 <p>Исходный код клиентов можно найти <a href="${docInfo.gameClientsURL}">здесь</a>.
-<p>Исходный код на <a href="${docInfo.gameSourcesURL}">в git репозитории</a> </p>
+<%--<p>Исходный код на <a href="${docInfo.gameSourcesURL}">в git репозитории</a> </p>--%>
