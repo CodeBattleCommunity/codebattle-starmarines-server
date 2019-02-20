@@ -164,10 +164,7 @@ public class TriangleGalaxy extends Galaxy {
         List<Portal> expired = portals.stream()
                 .map(portal -> (Portal) portal)
                 .filter(portal -> portal.countDownTtl() <= 0)
-                .peek(portal -> {
-                    vertexes.get(portal.getSource()).getNeighbours().remove(vertexes.get(portal.getTarget()));
-                    vertexes.get(portal.getTarget()).getNeighbours().remove(vertexes.get(portal.getSource()));
-                })
+                .peek(portal -> vertexes.get(portal.getSource()).disconnect(vertexes.get(portal.getTarget())))
                 .collect(Collectors.toList());
         edges.removeAll(expired);
         portals.removeAll(expired);

@@ -79,6 +79,15 @@ public class Vertex {
         return Edge.of(this.id, vertex.id);
     }
 
+    public void disconnect(Vertex vertex) {
+        this.oneWayDisconnect(vertex);
+        vertex.oneWayDisconnect(this);
+    }
+
+    private void oneWayDisconnect(Vertex vertex) {
+        this.neighbors.remove(vertex.getId());
+    }
+
     public void setBasePlanet(boolean basePlanet) {
         this.basePlanet = basePlanet;
     }
