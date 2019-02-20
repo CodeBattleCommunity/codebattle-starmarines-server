@@ -3140,11 +3140,10 @@ var renderBlock = {
 
     updateWaysMap(portals) {
         portals.forEach(portal => {
-            let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, 'portal');
+            let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, null);
             temp.name = 'portal';
             renderBlock.actionMap[`${portal.edgeTargetId} ${portal.edgeSourceId}`] = temp;
             renderBlock.actionMap[`${portal.edgeSourceId} ${portal.edgeTargetId}`] = temp;
-    
         });
     },
 
@@ -3364,8 +3363,8 @@ var renderBlock = {
             line2.name = 'blackhole';
         } else if (type === 'portal') {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
-                color: 0xFFFFFF,
-                linewidth: 0.9,
+                color: 0x0012FF,
+                linewidth: 1.9,
                 vertexColors: true
             }));
             // line2.name = 'portal'
@@ -3672,18 +3671,27 @@ var loopBlock = {
         }
         
         renderBlock.scene.__objects.forEach(item => {
-            if (item.name === 'blackhole' || 'portal') {
+            if (item.name === 'blackhole') {
                 renderBlock.scene.removeObject3D(item);
             }   
         });
 
+        
         for (let action in renderBlock.actionMap) {
             if (renderBlock.actionMap[action].name === 'portal') {
                 delete renderBlock.actionMap[action];
-                animate();
+
+                renderBlock.scene.removeObject3D(renderBlock.scene.__objects[renderBlock.scene.__objects.length-1])
+                
             }
         }
+        console.log(renderBlock);
 
+        if (json && json.portals && json.portals.length > 0) {
+            planetPortals = json.portals;
+            renderBlock.updateWaysMap(planetPortals);
+        }
+        
         if (json && json.disasters && json.disasters.length > 0) {
             const disasters = json.disasters;
             disasters.forEach(element => {
@@ -3700,8 +3708,6 @@ var loopBlock = {
                     renderBlock.arrowBuilder(hole.edgeSourceId, hole.edgeTargetId, 1, 'blackhole');
                 }
             });
-
-            renderBlock.updateWaysMap(blackHoles);
         }
         
             
