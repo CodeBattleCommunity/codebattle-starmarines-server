@@ -180,6 +180,7 @@ public class GameDAO {
 					.errorDelayMs((Long) settings.get(SettingsOption.ERROR_RESPONSE_DELAY))
 					.startRowsToShow((Integer) settings.get(SettingsOption.STAT_ROWS_TO_SHOW))
 					.registrationOpened((Boolean) settings.get(SettingsOption.REGISTRATION_IS_OPEN))
+					.gameCreationEnabled((Boolean) settings.get(SettingsOption.USER_BATTLE_CREATION_ENABLED))
 					.minPlayers((Integer) settings.get(SettingsOption.MINIMAL_PLAYERS_NUMBER))
 					.maxPlayers((Integer) settings.get(SettingsOption.MAXIMAL_PLAYERS_NUMBER))
 					.roundTurns((Long) settings.get(SettingsOption.GAME_TURNS_LIMIT))

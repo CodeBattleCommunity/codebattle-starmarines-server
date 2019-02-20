@@ -38,4 +38,18 @@
       <where>ID = 'INTER_PLANET_DISASTER_FACTOR'</where>
     </update>
   </changeSet>
+
+  <changeSet id="fix_client_url_settings" author="Igor_Petrov@epam.com">
+    <update tableName="SETTINGS" >
+      <column name="VAL" value="https://github.com/IzhevskCodeBattle/codebattle-starmarines-clients" />
+      <where>ID = 'GAME_CLIENTS_URL'</where>
+    </update>
+  </changeSet>
+
+  <changeSet id="decrease_portal_probability" author="Igor_Petrov@epam.com">
+    <update tableName="SETTINGS" >
+      <column name="VAL" value="0.05" />
+      <where>ID = 'PORTAL_OPENING_PROBABILITY'</where>
+    </update>
+  </changeSet>
 </databaseChangeLog>

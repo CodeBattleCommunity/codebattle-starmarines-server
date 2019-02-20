@@ -99,11 +99,12 @@ public class GameInstance extends Observable {
     @Setter
     private Map<GameInstance, Set<PeerController>> clientsPeers = new ConcurrentHashMap<>();
 
-    public GameInstance(long gameId, GameType type, List<UserScore> statistics, Map<Long, User> users, Galaxy galaxy) {
+    public GameInstance(long gameId, GameType type, List<UserScore> statistics, Map<Long, User> users, User creator, Galaxy galaxy) {
         this.id = gameId;
         this.type = type;
         this.statistic = statistics;
         this.players = users;
+        this.creator = creator;
         this.started = true;
         this.finished = true;
         this.galaxy = galaxy;

@@ -88,9 +88,10 @@ public class GameController {
             info.setCreator(userDAO.getUserWith(gameStats.getCreatorId()));
             model.addAttribute(AttributesEnum.GAME_INFO, info);
         }
+
         Map<Long, GameInstance> games;
         if (client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())) {
-            games = gameModel.getAllTournaments(true);
+            games = gameModel.getAllTournaments(null);
             if (!model.containsAttribute(AttributesEnum.CREATE_GAME_FORM)) {
                 CreateGameForm createGameForm = new CreateGameForm();
                 model.addAttribute(AttributesEnum.CREATE_GAME_FORM, createGameForm);
@@ -99,6 +100,11 @@ public class GameController {
         } else {
             games = gameModel.getNotStartedTournaments();
         }
+
+        boolean isGameCreationEnabled = client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())
+                || gameDAO.getSettings().isGameCreationEnabled();
+        model.addAttribute(AttributesEnum.BATTLE_CREATION_ENABLED, isGameCreationEnabled);
+
         Map<Long, GameInfo> gamesToShow = new HashMap<Long, GameInfo>(games.size());
         for(Long gameId : games.keySet()) {
             GameInfo gameInfo = new GameInfo();
@@ -391,7 +397,7 @@ public class GameController {
     @RequestMapping(method = RequestMethod.GET, value = "/" + ViewsEnum.BROADCAST + ViewsEnum.EXTENSION)
     public String showGameForBroadcasting(@RequestParam(required = true, value = "gameId") Long gameId, ModelMap model) {
         Model gameModel = Model.getInstance();
-        GameInstance gameInstance = gameModel.getGameById(gameId);
+        GameInstance gameInstance = gameModel.getGameById(gameId, true);
         if (gameInstance != null) {
             Game gameStats = gameDAO.getById(gameId);
             GameInfo gi = new GameInfo();
@@ -418,7 +424,7 @@ public class GameController {
         }
 
         Map<Long, GameInstance> games = client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())
-            ? gameModel.getAllTournaments(true)
+            ? gameModel.getAllTournaments(null)
             : gameModel.getNotStartedGames();
 
         Map<Long, GameInfo> gamesToShow = new TreeMap<>(Comparator.reverseOrder());
