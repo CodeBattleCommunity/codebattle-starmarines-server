@@ -13,7 +13,7 @@
     <c:forEach var="e" items="${settings.opts}">
         <div class="row">
             <label class="signUp"><c:out value="${e.key}"  />:</label>
-            <form:input maxlength="30" cssClass="float-right" path="opts['${e.key}']"/>
+            <form:input cssClass="float-right" path="opts['${e.key}']"/>
             <br/>
             <c:set var="descKey" value="${e.key}" />
             <i><c:out value="${settings.descriptions[descKey]}" /></i>
