@@ -3140,7 +3140,6 @@ var renderBlock = {
 
     updateWaysMap(portals) {
         portals.forEach(portal => {
-            console.log('-----', portal)
             let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, 'portal');
             temp.name = 'portal';
             renderBlock.actionMap[`${portal.edgeTargetId} ${portal.edgeSourceId}`] = temp;
@@ -3673,10 +3672,17 @@ var loopBlock = {
         }
         
         renderBlock.scene.__objects.forEach(item => {
-            if (item.name === 'blackhole') {
+            if (item.name === 'blackhole' || 'portal') {
                 renderBlock.scene.removeObject3D(item);
             }   
         });
+
+        for (let action in renderBlock.actionMap) {
+            if (renderBlock.actionMap[action].name === 'portal') {
+                delete renderBlock.actionMap[action];
+                animate();
+            }
+        }
 
         if (json && json.disasters && json.disasters.length > 0) {
             const disasters = json.disasters;
@@ -3694,6 +3700,8 @@ var loopBlock = {
                     renderBlock.arrowBuilder(hole.edgeSourceId, hole.edgeTargetId, 1, 'blackhole');
                 }
             });
+
+            renderBlock.updateWaysMap(blackHoles);
         }
         
             
