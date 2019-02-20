@@ -3139,18 +3139,13 @@ var renderBlock = {
     },
 
     updateWaysMap(portals) {
-        let prevPortals;
-        renderBlock.actionMap
-
-
-
         portals.forEach(portal => {
-            let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, false);
-
+            console.log('-----', portal)
+            let temp = renderBlock.arrowBuilder(portal.edgeSourceId, portal.edgeTargetId, 1, 'portal');
+            temp.name = 'portal';
             renderBlock.actionMap[`${portal.edgeTargetId} ${portal.edgeSourceId}`] = temp;
             renderBlock.actionMap[`${portal.edgeSourceId} ${portal.edgeTargetId}`] = temp;
-            
-
+    
         });
     },
 
@@ -3374,7 +3369,7 @@ var renderBlock = {
                 linewidth: 0.9,
                 vertexColors: true
             }));
-            line2.name = 'portal'
+            // line2.name = 'portal'
         } else if (!type) {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
                 color: 0x9BD3FF,
@@ -3663,19 +3658,25 @@ var loopBlock = {
         //        console.log('\n\nprevTurn: ' + modelBlock.turn + ' newTurn: ' + json.turnNumber );
         modelBlock.turn = json.turnNumber;
         //        modelBlock.prevStep[modelBlock.turn] = modelBlock.planetMap.slice();
-
+        
         //                        modelBlock.jsonResponse.push(json);
         planetOwners = json.playersActions.planetOwners;
         for(p in planetOwners) {
-
+            
             for(mp in modelBlock.planetMap)  {
                 if(planetOwners[p].id == modelBlock.planetMap[mp].id) {
                     modelBlock.planetMap[mp].owner = planetOwners[p].owner;
                     modelBlock.planetMap[mp].unitsCount = planetOwners[p].unitsCount;
                 }
             }
-
+            
         }
+        
+        renderBlock.scene.__objects.forEach(item => {
+            if (item.name === 'blackhole') {
+                renderBlock.scene.removeObject3D(item);
+            }   
+        });
 
         if (json && json.disasters && json.disasters.length > 0) {
             const disasters = json.disasters;
@@ -3687,61 +3688,22 @@ var loopBlock = {
                     blackHoles.push(element);
                 }
             });
-            // hide black lines between planets
-            renderBlock.scene.__objects.forEach(item => {
-                if (item.name === 'blackhole') {
-                    renderBlock.scene.removeObject3D(item);
-                }   
-            });
-            // add black lines between planet when blackhole
+
             blackHoles.forEach(hole => {
                 if (hole && hole.edgeSourceId && hole.edgeTargetId) {
                     renderBlock.arrowBuilder(hole.edgeSourceId, hole.edgeTargetId, 1, 'blackhole');
                 }
             });
         }
-
-        renderBlock.scene.__objects.forEach(item => {
-            if (item.name === 'portal') {
-                renderBlock.scene.removeObject3D(item);
-            }   
-        });
-
-        // TODO 
-        // убирать дронов из закрытых порталов
-        for (let item in renderBlock.actionMap) {
-            if (renderBlock.actionMap[item].name  === '1') {
-                delete renderBlock.actionMap[item];
-            }
-        }
-        // renderBlock.actionMap.forEach(item => {
-        //     if (item.name === 'portal') {
-        //         renderBlock.actionMap.removeObject3D(item);
-        //     } 
-        // })
-        if (json && json.portals && json.portals.length > 0) {
-            const portals = json.portals;
-           
-            portals.forEach(port => {
-                if (port && port.edgeSourceId && port.edgeTargetId) {
-                    planetPortals.push(port.edgeSourceId);
-                    planetPortals.push(port.edgeTargetId);
-                }
-            });
+        
             
-            // portals.forEach(item => {
-                //     if (item && item.edgeSourceId && item.edgeTargetId) {
-                    //         renderBlock.arrowBuilder(item.edgeSourceId, item.edgeTargetId, 1, 'portal');
-                    //     } 
-                    // });
-            renderBlock.updateWaysMap(portals);
-        }
-                
         modelBlock.actionMap = json.playersActions.actions;
 
-
+        
+        
         res = renderBlock.updateView(planetMeteors, planetPortals, blackHoles);
-
+        
+        
         if(!res) {
             console.log(xmlhttp.responseText);
         }
