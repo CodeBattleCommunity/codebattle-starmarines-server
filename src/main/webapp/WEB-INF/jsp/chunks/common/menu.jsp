@@ -17,15 +17,23 @@
 	<c:url var="linkStatisticsTitle" value="label.menu.statistics" />
 	<c:url var="logoutUrl" value="/logout.html" />
 
+	<c:url var="linkAdmin" value="/admin.html" />
+	<c:url var="linkAdminTitle" value="label.menu.admin" />
+
 	<c:set var="currentPageAddress" value="${requestScope.get('javax.servlet.forward.servlet_path')}" />
+
+	<c:set value='${pageContext.request.userPrincipal.principal.hasAnyRole("ROLE_ADMIN")}' var="isAdmin" />
 	
 <div class="menu-wrap">
     <div class="menu">
             <a class="item ${fn:endsWith(linkProfile, currentPageAddress) ? 'active' : ''}" href="${linkProfile}"><spring:message code="${linkProfileTitle}" /></a>
             <a class="item ${fn:endsWith(linkTraining, currentPageAddress) ? 'active' : ''}" href="${linkTraining}"><spring:message code="${linkTrainingTitle}" /></a>
             <a class="item ${fn:endsWith(linkBattle, currentPageAddress) ? 'active' : ''}" href="${linkBattle}"><spring:message code="${linkBattleTitle}" /></a>
-	    <a class="item ${fn:endsWith(linkStatistics, currentPageAddress) ? 'active' : ''}" href="${linkStatistics}"><spring:message code="${linkStatisticsTitle}" /></a>
-	<span id="countdown"> Турнир начнется через: </span>
+	    	<a class="item ${fn:endsWith(linkStatistics, currentPageAddress) ? 'active' : ''}" href="${linkStatistics}"><spring:message code="${linkStatisticsTitle}" /></a>
+		<c:if test="${isAdmin}">
+			<a class="item ${fn:endsWith(linkAdmin, currentPageAddress) ? 'active' : ''}" href="${linkAdmin}"><spring:message code="${linkAdminTitle}" /></a>
+		</c:if>
+	<%--<span id="countdown"> Турнир начнется через: </span>--%>
     <div id="doclink">
         <a class="item icon-abys ${fn:endsWith(linkDocumentation, currentPageAddress) ? 'active' : ''}" href="${linkDocumentation}"><spring:message code="${linkDocumentationTitle}" /></a>
         <a class="item" href="/logout.html"><spring:message code="label.menu.logout"/></a>

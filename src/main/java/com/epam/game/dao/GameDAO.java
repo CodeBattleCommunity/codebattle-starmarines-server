@@ -8,8 +8,10 @@ import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.UserScore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -19,6 +21,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.annotation.security.RolesAllowed;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,7 +38,10 @@ import java.util.stream.Stream;
  */
 @Repository
 @CacheConfig(cacheNames = "settings")
+@Slf4j
 public class GameDAO {
+
+	private static final String SETTINGS_CACHE_KEY = "settings";
 
 	private JdbcTemplate jdbcTemplate;
 	private NamedParameterJdbcTemplate namedTemplate;
@@ -138,6 +144,18 @@ public class GameDAO {
 		}
 	}
 
+	private RowMapper<FlattenSettings> flattenSettingsMapper = (rs, rowNum) -> {
+        Map<String, String> opts = new HashMap<>();
+        Map<String, String> descriptions = new HashMap<>();
+
+        do {
+            String id = rs.getString("ID");
+            opts.put(id, rs.getString("VAL"));
+            descriptions.put(id, rs.getString("DESCRIPTION"));
+        } while (rs.next());
+        return new FlattenSettings(opts, descriptions);
+    };
+
 	private RowMapper<GameSettings> settingsMapper = new RowMapper<GameSettings>() {
 
 		@SuppressWarnings("unchecked")
@@ -198,10 +216,35 @@ public class GameDAO {
 		this.namedTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
-	@Cacheable("settings")
+	@Cacheable(SETTINGS_CACHE_KEY)
     public GameSettings getSettings() {
 		return jdbcTemplate.queryForObject("select ID, VAL from SETTINGS", settingsMapper);
 	}
+
+	@CacheEvict(value = SETTINGS_CACHE_KEY, allEntries = true)
+	@RolesAllowed("ROLE_ADMIN")
+	public void restoreDefaultSettings() {
+		jdbcTemplate.execute("update SETTINGS set VAL = DEF");
+	}
+
+	@CacheEvict(value = SETTINGS_CACHE_KEY, allEntries = true)
+	@RolesAllowed("ROLE_ADMIN")
+	public void applySettings(FlattenSettings settings) {
+		settings.getOpts().forEach((key, value) -> jdbcTemplate.update("update SETTINGS set val = ? where id = ?", ps -> {
+			ps.setString(1, value);
+			ps.setString(2, key);
+		}));
+	}
+
+	public FlattenSettings getFlattenSettings() {
+	    return jdbcTemplate.queryForObject("select ID, VAL, DESCRIPTION from SETTINGS", flattenSettingsMapper);
+    }
+
+	@RolesAllowed("ROLE_ADMIN")
+	@CacheEvict(value = "settings", allEntries = true)
+	public void evictSettingsCache() {
+	    log.warn("Evicting settings cache");
+    }
 
     public Long getNumberOfPlayedGamesFor(User user) {
 //	    "select count(*) from GAME_SESSION_STATISTICS where USER_ID = ?"
