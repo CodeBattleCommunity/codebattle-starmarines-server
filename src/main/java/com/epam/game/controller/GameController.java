@@ -88,6 +88,7 @@ public class GameController {
             info.setCreator(userDAO.getUserWith(gameStats.getCreatorId()));
             model.addAttribute(AttributesEnum.GAME_INFO, info);
         }
+
         Map<Long, GameInstance> games;
         if (client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())) {
             games = gameModel.getAllTournaments(null);
@@ -99,6 +100,11 @@ public class GameController {
         } else {
             games = gameModel.getNotStartedTournaments();
         }
+
+        boolean isGameCreationEnabled = client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())
+                || gameDAO.getSettings().isGameCreationEnabled();
+        model.addAttribute(AttributesEnum.BATTLE_CREATION_ENABLED, isGameCreationEnabled);
+
         Map<Long, GameInfo> gamesToShow = new HashMap<Long, GameInfo>(games.size());
         for(Long gameId : games.keySet()) {
             GameInfo gameInfo = new GameInfo();
