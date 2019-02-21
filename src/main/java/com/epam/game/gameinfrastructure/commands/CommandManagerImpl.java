@@ -63,7 +63,7 @@ public class CommandManagerImpl implements CommandManager {
         GameInstance game = obtainGame(token);
 
         UserSessionState gameStateValidation = validateGameState(game);
-        if (gameStateValidation.isValid()) {
+        if (!gameStateValidation.isValid()) {
             return gameStateValidation;
         }
 
