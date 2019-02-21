@@ -223,7 +223,9 @@
     <td>1009</td><td>Превышен разрешенный лимит action'ов от клиента</td>
   </tr>
 </table>
+<br/>
+<br/>
 
-<h3 id="example">Пример бота на Java</h3>
+<h3 id="example">Игровые клиенты</h3>
 <p>Исходный код клиентов можно найти <a href="${docInfo.gameClientsURL}">здесь</a>.
 <%--<p>Исходный код на <a href="${docInfo.gameSourcesURL}">в git репозитории</a> </p>--%>
