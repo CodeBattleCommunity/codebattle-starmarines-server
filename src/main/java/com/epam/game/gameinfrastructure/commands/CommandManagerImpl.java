@@ -13,12 +13,10 @@ import com.epam.game.gamemodel.model.action.impl.LoginAction;
 import com.epam.game.gamemodel.model.action.impl.MoveAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,6 +61,11 @@ public class CommandManagerImpl implements CommandManager {
         }
 
         GameInstance game = obtainGame(token);
+
+        UserSessionState gameStateValidation = validateGameState(game);
+        if (gameStateValidation.isValid()) {
+            return gameStateValidation;
+        }
 
         PeerController pc = new PeerController(game.getUserByToken(token), session);
 
