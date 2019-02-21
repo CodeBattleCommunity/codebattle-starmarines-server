@@ -3651,10 +3651,6 @@ var loopBlock = {
     
     jsonHandler: function(json, xmlhttp) {
 
-        // fix for scene rerendering
-        
-
-
         let planetMeteors = [];
         let planetPortals = [];
         let blackHoles = [];
@@ -3719,13 +3715,14 @@ var loopBlock = {
         
         modelBlock.actionMap = json.playersActions.actions;
 
+
         res = renderBlock.updateView(planetMeteors, planetPortals);
 
-        for (let act in renderBlock.actionMap) {
-            if (renderBlock.actionMap[act].name === 'portal') {
-                delete renderBlock.actionMap[act];
-            }
-        }
+        // for (let act in renderBlock.actionMap) {
+        //     if (renderBlock.actionMap[act].name === 'portal') {
+        //         delete renderBlock.actionMap[act];
+        //     }
+        // }
 
         if(!res) {
             console.log(xmlhttp.responseText);
