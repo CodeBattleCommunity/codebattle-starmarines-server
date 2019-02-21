@@ -53,8 +53,10 @@ public class ServerWebSocketHandler extends TextWebSocketHandler {
 
     @SneakyThrows
     private void terminateSession(WebSocketSession session, String message, CloseStatus closeStatus) {
-        session.sendMessage(new TextMessage(commandConverter.buildErrorResponse(Collections.singletonList(message))));
-        session.close(closeStatus);
+        if (session.isOpen()) {
+            session.sendMessage(new TextMessage(commandConverter.buildErrorResponse(Collections.singletonList(message))));
+            session.close(closeStatus);
+        }
     }
 
     private String extractToken(WebSocketSession session) {
