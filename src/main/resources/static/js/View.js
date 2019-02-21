@@ -3348,14 +3348,7 @@ var renderBlock = {
 	    geoLine2.vertices.push(mid);
         geoLine2.vertices.push(arrow.to);
 
-        if (type === 'clear') {
-            line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
-                color: 0x000000,
-                linewidth: 0,
-                vertexColors: true
-            }));
-            line2.name = 'clear';
-        } else if (type === 'blackhole') {
+        if (type === 'blackhole') {
             line2 = new THREE.Line(geoLine2, new THREE.LineBasicMaterial({  //<-for canvas 
                 color: 0x000000,
                 linewidth: 0.9,
