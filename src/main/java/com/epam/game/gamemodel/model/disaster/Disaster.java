@@ -17,8 +17,8 @@ public class Disaster<T> {
     private int ttl;
     protected double damageFactor;
 
-    public int calculateUnits(int unitsCount) {
-        return (int) (unitsCount - (unitsCount * damageFactor));
+    public int calculateDamage(int unitsCount) {
+        return (int) (unitsCount * damageFactor);
     }
 
     public int countDownTtl() {

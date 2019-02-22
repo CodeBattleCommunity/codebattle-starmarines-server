@@ -224,7 +224,7 @@ public class TriangleGalaxy extends Galaxy {
     public int moveUnits(User player, Vertex from, Vertex to, int unitsCount) throws Exception {
         Edge moveEdge = Edge.of(from.getId(), to.getId());
         if (interPlanetDisasters.containsKey(moveEdge)) {
-            unitsCount = interPlanetDisasters.get(moveEdge).calculateUnits(unitsCount);
+            unitsCount = interPlanetDisasters.get(moveEdge).calculateDamage(unitsCount);
         }
         from.decreaseUnits(unitsCount, false);
         to.addUnits(player, unitsCount);
@@ -234,7 +234,7 @@ public class TriangleGalaxy extends Galaxy {
     @Override
     public void recalculateVertex(Vertex v) {
         if (localPlanetDisasters.containsKey(v.getId())) {
-            int damage = localPlanetDisasters.get(v.getId()).calculateUnits(v.getUnitsCount());
+            int damage = localPlanetDisasters.get(v.getId()).calculateDamage(v.getUnitsCount());
             try {
                 v.decreaseUnits(damage, true);
             } catch (Exception e) {

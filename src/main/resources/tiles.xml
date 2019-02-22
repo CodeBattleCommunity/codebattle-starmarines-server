@@ -68,6 +68,12 @@
         <put-attribute name="currentHeadImports" value="/WEB-INF/jsp/chunks/trainingPage/headImports.jsp" />
         <put-attribute name="content" value="/WEB-INF/jsp/chunks/trainingPage/page.jsp" />
     </definition>
+
+    <definition name="admin" extends="innerPage" >
+        <put-attribute name="title" value="HARDCODED STARMARINES : Настройки"/>
+        <put-attribute name="currentHeadImports" value="/WEB-INF/jsp/chunks/admin/headImports.jsp" />
+        <put-attribute name="content" value="/WEB-INF/jsp/chunks/admin/page.jsp" />
+    </definition>
     
     <definition name="battle" extends="innerPage">
         <put-attribute name="title" value="HARDCODED STARMARINES : Сражение"/>

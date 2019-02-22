@@ -11,6 +11,7 @@ import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.model.action.impl.LoginAction;
 import com.epam.game.gamemodel.model.action.impl.MoveAction;
+import com.fasterxml.jackson.core.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,8 @@ public class CommandManagerImpl implements CommandManager {
         ClientCommand clientCommand = null;
         try {
             clientCommand = commandConverter.convertToClientCommand(clientPayload);
+        } catch (JsonParseException parseException) {
+            log.error("Invalid command received from client with token: {}\nCommand:\n{}", token, clientPayload);
         } catch (Exception e) {
             log.error("Invalid command received from client with token: " + token, e);
             return UserSessionState.invalid(CloseStatus.BAD_DATA, String.format("Invalid json command received from client '%s'." +
@@ -63,7 +66,7 @@ public class CommandManagerImpl implements CommandManager {
         GameInstance game = obtainGame(token);
 
         UserSessionState gameStateValidation = validateGameState(game);
-        if (gameStateValidation.isValid()) {
+        if (!gameStateValidation.isValid()) {
             return gameStateValidation;
         }
 

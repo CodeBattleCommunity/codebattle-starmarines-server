@@ -69,7 +69,9 @@ public class GameInstance extends Observable {
 
     private List<Edge> portals;
 
-	private List<User> survivors;
+    private List<Edge> lastTurnPortals;
+
+    private List<User> survivors;
 
 	private boolean started;
 
@@ -117,6 +119,7 @@ public class GameInstance extends Observable {
 		this.players = new HashMap<>();
 		this.currentChanges = new LinkedList<>();
 		this.lastTurnChanges = new LinkedList<>();
+		this.lastTurnPortals = new LinkedList<>();
 		this.disasters = new LinkedList<>();
 		this.lastTurnDisasters = new LinkedList<>();
 		this.survivors = new LinkedList<>();
@@ -336,15 +339,17 @@ public class GameInstance extends Observable {
         if (!isStarted() || isFinished()) {
             throw new IllegalStateException();
         }
-        disasters = galaxy.generateDisasters();
         recalculate();
+        disasters = galaxy.generateDisasters();
         portals = galaxy.generatePortals();
         setChanged();
         notifyObservers(galaxy.makeSnapshot());
         lastTurnChanges = currentChanges;
         lastTurnDisasters = disasters;
+        lastTurnPortals = portals;
         currentChanges = new LinkedList<>();
         disasters = new LinkedList<>();
+        portals = new LinkedList<>();
         turnsNumber++;
         performBotsActions();
     }
@@ -424,7 +429,7 @@ public class GameInstance extends Observable {
     }
 
     public List<Edge> getPortals() {
-        return new LinkedList<>(portals);
+        return new LinkedList<>(lastTurnPortals);
     }
 
     /**

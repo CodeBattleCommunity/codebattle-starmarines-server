@@ -30,6 +30,7 @@ public class InformationController {
         model.addAttribute("docInfo", settings.getDocInfo());
         model.addAttribute("disasterSettings", settings.getDisasterSettings());
         model.addAttribute("portalSettings", settings.getPortalSettings());
+        model.addAttribute("commonSettings", settings);
         return ViewsEnum.INFO_PAGE;
     }
 }
