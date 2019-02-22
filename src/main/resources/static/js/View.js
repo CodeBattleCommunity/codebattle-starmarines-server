@@ -572,7 +572,7 @@ var modelBlock = {
         var customContainer = document.body.appendChild(document.createElement('div'));
         customContainer.id = 'stats';
         customContainer.appendChild(modelBlock.statGui.domElement);
-
+        
         var style = customContainer.style;
         style.visibility = "visible";
         style.position = "fixed";
@@ -957,6 +957,9 @@ var renderBlock = {
                 THREEx.FullScreen.request();
                 $('canvas').css({
                     "background-image":'url("./img/background_alt.jpg")'
+                });
+                $('#canv').css({
+                    'background-image': 'none'
                 });
                 try{
                     leaveGame = document.getElementById("leaveGame");
