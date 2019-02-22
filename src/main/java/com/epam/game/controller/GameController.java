@@ -289,7 +289,8 @@ public class GameController {
         GameThread gameThread = new GameThread(game, gameDAO.getSettings().getTurnDelayMs());
         new Thread(gameThread).start();
         if(client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority())) {
-            return showGameControl(id, model, client);
+            model.addAttribute(AttributesEnum.GAME, game);
+            return "redirect:" + "/" + ViewsEnum.GAME_CONTROL + ViewsEnum.EXTENSION + "?gameId=" + game.getId();
         } else {
             return "redirect:" + ViewsEnum.BATTLE + ViewsEnum.EXTENSION;
         }
