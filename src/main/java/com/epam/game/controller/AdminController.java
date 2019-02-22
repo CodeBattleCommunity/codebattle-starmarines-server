@@ -38,7 +38,7 @@ public class AdminController {
     public String restoreDefaults(Model model) {
         gameDAO.restoreDefaultSettings();
         populateSettingsModel(model);
-        return ViewsEnum.ADMIN;
+        return "redirect:/" + ViewsEnum.ADMIN + ViewsEnum.EXTENSION;
     }
 
     private void populateSettingsModel(Model model) {
