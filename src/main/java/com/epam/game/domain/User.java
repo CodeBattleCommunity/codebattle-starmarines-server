@@ -26,6 +26,7 @@ public class User implements UserDetails {
     private String token;
     private String email;
     private String phone;
+    private boolean bot;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

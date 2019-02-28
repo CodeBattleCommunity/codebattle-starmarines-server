@@ -113,8 +113,13 @@
             <column name="DEF" value="0.05" />
             <where>ID = 'PORTAL_OPENING_PROBABILITY'</where>
         </update>
-
     </changeSet>
 
+    <changeSet id="disable_all_disasters_by_default" author="Igor_Petrov@epam.com">
+        <update tableName="SETTINGS" >
+            <column name="VAL" value="0.0" />
+            <where>ID in ('LOCAL_DISASTER_PROBABILITY_PER_VERTEX', 'INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE', 'PORTAL_OPENING_PROBABILITY')</where>
+        </update>
+    </changeSet>
 
 </databaseChangeLog>
