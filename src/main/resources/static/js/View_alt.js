@@ -2203,8 +2203,6 @@ var renderBlock = {
 
     fillGLModel: function () {
         //        console.log("filling the render model");
-
-
         renderBlock.materialDepth = new THREE.MeshDepthMaterial();
         renderBlock.mesh = new THREE.Object3D();
 

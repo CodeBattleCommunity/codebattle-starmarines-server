@@ -24,6 +24,7 @@ public final class ViewsEnum {
     /* new views */
     public static final String INFO_PAGE = "info";
     public static final String SETTINGS = "settings";
+    public static final String ADMIN = "admin";
     public static final String BATTLE = "battle";
     public static final String NO_COOKIE = "noCookie";
 

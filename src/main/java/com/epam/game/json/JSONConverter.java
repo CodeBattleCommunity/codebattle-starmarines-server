@@ -2,9 +2,11 @@ package com.epam.game.json;
 
 import com.epam.game.dao.GameDAO;
 import com.epam.game.domain.User;
+import com.epam.game.gamemodel.model.Edge;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.UserScore;
 import com.epam.game.gamemodel.model.Vertex;
+import com.epam.game.gamemodel.model.disaster.Disaster;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,6 +120,31 @@ public class JSONConverter {
             change.put("unitCount", ch.count);
             actions.add(change);
         }
+
+        JSONArray disastersArray = new JSONArray();
+        for (Disaster d : game.getDisasters()) {
+            Class<?> disasterTargetType = d.getTarget().getClass();
+            JSONObject disasterObject = new JSONObject();
+            if (disasterTargetType.isAssignableFrom(Vertex.class)) {
+                disasterObject.put("planetId", ((Disaster<Vertex>) d).getTarget().getId());
+            } else if (disasterTargetType.isAssignableFrom(Edge.class)) {
+                Disaster<Edge> disaster = d;
+                disasterObject.put("edgeSourceId", disaster.getTarget().getSource());
+                disasterObject.put("edgeTargetId", disaster.getTarget().getTarget());
+            }
+            disasterObject.put("type", d.getType().name());
+            disastersArray.add(disasterObject);
+        }
+        result.put("disasters", disastersArray);
+
+        JSONArray portalsArray = new JSONArray();
+        for (Edge p : game.getPortals()) {
+            JSONObject portalObject = new JSONObject();
+            portalObject.put("edgeSourceId",p.getSource());
+            portalObject.put("edgeTargetId",p.getTarget());
+            portalsArray.add(portalObject);
+        }
+        result.put("portals",portalsArray);
 
         playersActions.put("actions", actions);
         result.put("playersActions", playersActions);

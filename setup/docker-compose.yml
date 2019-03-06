@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  hardinv-server:
+    image: dojo/hardinv-server:0.0.1
+    container_name: hardinv-server
+    restart: on-failure
+    networks:
+      - hardinv-net
+    ports:
+      - '8081:8080'
+      - '8000:8000'
+    depends_on:
+      - hardinv-db
+    environment:
+      - SPRING_DATASOURCE_HOST=hardinv-db
+      - SPRING_DATASOURCE_PORT=5432
+      - SPRING_DATASOURCE_DB=hardinv
+      - SPRING_DATASOURCE_USERNAME=HIapp
+      - SPRING_DATASOURCE_PASSWORD=hardcoded2014
+
+  hardinv-db:
+      image: dojo/postgres:hardinv
+      container_name: hardinv-db
+      volumes:
+        - '/data/hardinv:/var/lib/postgresql/data/pgdata-hardinv'
+      networks:
+        - hardinv-net
+      ports:
+        - '5434:5432'
+      environment:
+        - 'PGDATA=/var/lib/postgresql/data/pgdata-hardinv'
+
+networks:
+  hardinv-net:
+    internal: false

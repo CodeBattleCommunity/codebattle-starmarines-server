@@ -1,11 +1,12 @@
 spring:
   datasource:
     port: 5432
-    host: epruizhw0388
+    host: localhost
+#    db: hardinv
     driver-class-name: org.postgresql.Driver
-    url: 'jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/hardinv'
-    username: HIapp
-    password: hardcoded2014
+    url: 'jdbc:postgresql://${spring.datasource.host}:${spring.datasource.port}/${spring.datasource.db:postgres}'
+    username: postgres
+    password: Password25
 
   security:
     user:
@@ -15,3 +16,12 @@ spring:
     cache-names: settings
     caffeine:
       spec: expireAfterAccess=5s
+
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+
+websocket:
+  maxTextMessageBufferSize: 55000
+  maxBinaryMessageBufferSize: 55000

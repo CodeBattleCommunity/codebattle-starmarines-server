@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+  <changeSet id="add_portal_settings_0" author="Daniil_Nasretdinov@epam.com">
+    <insert tableName="SETTINGS">
+      <column name="ID" value="PORTAL_OPENING_PROBABILITY" />
+      <column name="VAL" value="0.10" />
+      <column name="DESCRIPTION">Вероятность возникновения портала за тик</column>
+    </insert>
+    <insert tableName="SETTINGS">
+      <column name="ID" value="PORTAL_OPENING_FACTOR_BY_PLANETS" />
+      <column name="VAL" value="0.20" />
+      <column name="DESCRIPTION">Максимальное кол-во порталов (в каждый момент времени) в % от кол-ва "стандартных" ребер графа галактики</column>
+    </insert>
+    <insert tableName="SETTINGS">
+      <column name="ID" value="PORTAL_TTL" />
+      <column name="VAL" value="2" />
+      <column name="DESCRIPTION">Кол-во тиков, на протяжении которых портал держится открытым</column>
+    </insert>
+  </changeSet>
+
+  <changeSet id="add_player_actions_limit_per_command" author="Igor_Petrov@epam.com">
+    <insert tableName="SETTINGS">
+      <column name="ID" value="PLAYER_ACTIONS_LIMIT_PER_COMMAND" />
+      <column name="VAL" value="1000" />
+      <column name="DESCRIPTION">Лимит количества action'ов клиента за одну команду</column>
+    </insert>
+  </changeSet>
+
+  <changeSet id="decrease_disasters_factor" author="Igor_Petrov@epam.com">
+    <update tableName="SETTINGS" >
+      <column name="VAL" value="0.05" />
+      <where>ID = 'INTER_PLANET_DISASTER_FACTOR'</where>
+    </update>
+  </changeSet>
+
+  <changeSet id="fix_client_url_settings" author="Igor_Petrov@epam.com">
+    <update tableName="SETTINGS" >
+      <column name="VAL" value="https://github.com/IzhevskCodeBattle/codebattle-starmarines-clients" />
+      <where>ID = 'GAME_CLIENTS_URL'</where>
+    </update>
+  </changeSet>
+
+  <changeSet id="decrease_portal_probability" author="Igor_Petrov@epam.com">
+    <update tableName="SETTINGS" >
+      <column name="VAL" value="0.05" />
+      <where>ID = 'PORTAL_OPENING_PROBABILITY'</where>
+    </update>
+  </changeSet>
+</databaseChangeLog>

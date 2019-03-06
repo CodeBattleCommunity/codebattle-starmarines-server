@@ -10,10 +10,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.adapter.standard.StandardWebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Igor_Petrov@epam.com
@@ -30,7 +32,10 @@ public class ServerWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        commandManager.handleUserCommands(session, extractToken(session), message.getPayload());
+        UserSessionState userSessionState = commandManager.handleUserCommands(session, extractToken(session), message.getPayload());
+        if (!userSessionState.isValid()) {
+            terminateSession(session, userSessionState.getErrorMessage(), userSessionState.getCloseStatus());
+        }
     }
 
     @Override
@@ -48,16 +53,28 @@ public class ServerWebSocketHandler extends TextWebSocketHandler {
 
     @SneakyThrows
     private void terminateSession(WebSocketSession session, String message, CloseStatus closeStatus) {
-        session.sendMessage(new TextMessage(commandConverter.buildErrorResponse(Collections.singletonList(message))));
-        session.close(closeStatus);
+        if (session.isOpen()) {
+            session.sendMessage(new TextMessage(commandConverter.buildErrorResponse(Collections.singletonList(message))));
+            session.close(closeStatus);
+        }
     }
 
     private String extractToken(WebSocketSession session) {
         List<String> tokenHeaders = session.getHandshakeHeaders().get(RequestXMLTag.TOKEN.getValue());
-        if (CollectionUtils.isEmpty(tokenHeaders)) {
-            return null;
+
+        if (!CollectionUtils.isEmpty(tokenHeaders)) {
+            return tokenHeaders.get(0);
         }
 
-        return tokenHeaders.get(0);
+        Map<String, List<String>> requestParams = ((StandardWebSocketSession) session).getNativeSession().getRequestParameterMap();
+        if (!CollectionUtils.isEmpty(requestParams) && requestParams.containsKey(RequestXMLTag.TOKEN.getValue())) {
+            tokenHeaders = requestParams.get(RequestXMLTag.TOKEN.getValue());
+        }
+
+        if (!CollectionUtils.isEmpty(tokenHeaders)) {
+            return tokenHeaders.get(0);
+        }
+
+        return null;
     }
 }

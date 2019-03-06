@@ -8,17 +8,19 @@ import com.epam.game.exceptions.IllegalCommandException;
 import com.epam.game.exceptions.NotEnoughPlayersException;
 import com.epam.game.gameinfrastructure.requessthandling.PeerController;
 import com.epam.game.gameinfrastructure.requessthandling.SocketResponseSender;
-import com.epam.game.gamemodel.mapgenerator.MapGenerator;
+import com.epam.game.gamemodel.map.Galaxy;
+import com.epam.game.gamemodel.model.disaster.Disaster;
 import com.epam.game.gamemodel.model.events.GameAbandoned;
 import com.epam.game.gamemodel.model.events.GameAbandonedListener;
 import com.epam.game.gamemodel.model.events.GameFinished;
 import com.epam.game.gamemodel.model.events.GameFinishedListener;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.logging.Logger;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents instance of a game field.
@@ -26,13 +28,15 @@ import java.util.logging.Logger;
  * @author Evgeny_Tetuhin
  * 
  */
+@Slf4j
 public class GameInstance extends Observable {
+
 
     /**
      * A transfer object to send information about units moving.
-     * 
+     *
      * @author Evgeny_Tetuhin
-     * 
+     *
      */
     public class Change { // in the event of sickness use refactoring.
 
@@ -47,16 +51,11 @@ public class GameInstance extends Observable {
             this.to = to;
             this.count = count;
         }
-
     }
 
-	private Logger log = Logger.getLogger(GameInstance.class.getName());
-
-	private MapGenerator mapGenerator;
+	private Galaxy galaxy;
 
 	private long id;
-
-	private Map<Long, Vertex> vertices;
 
 	private Map<Long, User> players;
 
@@ -64,7 +63,15 @@ public class GameInstance extends Observable {
 
 	private List<Change> lastTurnChanges; // Changes performed before last turn
 
-	private List<User> survivors;
+    private List<Disaster> disasters;
+
+    private List<Disaster> lastTurnDisasters;
+
+    private List<Edge> portals;
+
+    private List<Edge> lastTurnPortals;
+
+    private List<User> survivors;
 
 	private boolean started;
 
@@ -78,7 +85,7 @@ public class GameInstance extends Observable {
 
 	private String title;
 
-	private LinkedList<UserScore> statistic;
+	private List<UserScore> statistic;
 
 	private List<GameFinishedListener> finishListeners;
 
@@ -92,14 +99,31 @@ public class GameInstance extends Observable {
 
 	@Getter
     @Setter
-    private Map<GameInstance, Set<PeerController>> clientsPeers = new HashMap<>();
+    private Map<GameInstance, Set<PeerController>> clientsPeers = new ConcurrentHashMap<>();
+
+    public GameInstance(long gameId, GameType type, List<UserScore> statistics, Map<Long, User> users, User creator, Galaxy galaxy) {
+        this.id = gameId;
+        this.type = type;
+        this.statistic = statistics;
+        this.players = users;
+        this.creator = creator;
+        this.started = true;
+        this.finished = true;
+        this.galaxy = galaxy;
+        this.finishListeners = new ArrayList<>();
+        this.abandonListeners = new ArrayList<>();
+    }
+
 
 	public GameInstance(long id, GameType type, GameSettings gameSettings, User creator) {
-		this.vertices = new HashMap<>();
 		this.players = new HashMap<>();
 		this.currentChanges = new LinkedList<>();
 		this.lastTurnChanges = new LinkedList<>();
+		this.lastTurnPortals = new LinkedList<>();
+		this.disasters = new LinkedList<>();
+		this.lastTurnDisasters = new LinkedList<>();
 		this.survivors = new LinkedList<>();
+		this.portals = new LinkedList<>();
 		this.id = id;
 		this.type = type;
 		this.bots = new LinkedList<>();
@@ -112,9 +136,9 @@ public class GameInstance extends Observable {
         addObserver(SocketResponseSender.getInstance());
     }
 
-    public GameInstance(long id, MapGenerator generator, GameType type, GameSettings gameSettings, User creator) {
+    public GameInstance(long id, Galaxy generator, GameType type, GameSettings gameSettings, User creator) {
         this(id, type, gameSettings, creator);
-        this.mapGenerator = generator;
+        this.galaxy = generator;
     }
 
     /**
@@ -133,6 +157,7 @@ public class GameInstance extends Observable {
     public synchronized void move(long vertexId1, long vertexId2, int unitsCount, User player) throws IllegalCommandException {
         String command = String.format("Command ignored: [from %d to %d, %d units]", vertexId1, vertexId2, unitsCount);
         String errorMsg = null;
+        Map<Long, Vertex> vertices = galaxy.getPlanets();
         Vertex from = vertices.get(vertexId1);
         Vertex to = vertices.get(vertexId2);
         if (!vertices.containsKey(vertexId1) || !vertices.containsKey(vertexId2)) {
@@ -147,9 +172,10 @@ public class GameInstance extends Observable {
             errorMsg = "Negative number of units cannot be sent.";
         } else {
             try {
-                from.decreaseUnits(unitsCount);
-                to.addUnits(player, unitsCount);
-                currentChanges.add(new Change(vertexId1, vertexId2, unitsCount));
+                int unitsMoved = galaxy.moveUnits(player, from, to, unitsCount);
+                if (unitsCount > 0) {
+                    currentChanges.add(new Change(vertexId1, vertexId2, unitsMoved));
+                }
             } catch (Exception e) {
                 errorMsg = e.getMessage();
             }
@@ -179,8 +205,8 @@ public class GameInstance extends Observable {
      */
     private synchronized void recalculate() {
         List<User> newSurvivors = new LinkedList<User>();
-        for (Vertex v : vertices.values()) {
-            v.recalculate();
+        for (Vertex v : galaxy.getPlanets().values()) {
+            galaxy.recalculateVertex(v);
             if (v.getOwner() != null && !newSurvivors.contains(v.getOwner())) {
                 newSurvivors.add(v.getOwner());
             }
@@ -240,7 +266,7 @@ public class GameInstance extends Observable {
     private void finishStatistics() {
         Map<User, Integer> users = new HashMap<User, Integer>(players.size());
         int count;
-        for(Vertex v : vertices.values()){
+        for(Vertex v : galaxy.getPlanets().values()){
             if(v.getOwner() != null){
                count = v.getUnitsCount();
                 if(users.containsKey(v.getOwner())){
@@ -255,10 +281,9 @@ public class GameInstance extends Observable {
             us.setUser(entry.getKey());
             us.setUnitsCount(entry.getValue());
 	        us.setType(this.getType());
-            this.statistic.addLast(us);
+            this.statistic.add(us);
         }
         this.recalculateScore();
-        System.out.println(statistic.getFirst().getPlace());
     }
     
     /**
@@ -279,6 +304,7 @@ public class GameInstance extends Observable {
         if (players.isEmpty()) {
             this.abandon();
         }
+
     }
 
     /**
@@ -291,16 +317,16 @@ public class GameInstance extends Observable {
         if (players.size() < 2) {
             throw new NotEnoughPlayersException("Not enough players to start game");
         }
-        if (mapGenerator == null) {
+        if (galaxy == null) {
             throw new IllegalStateException("Map generator was not set.");
         }
         started = true;
-        vertices = mapGenerator.generate(players);
+        galaxy.generate(players);
         turnsNumber = 0;
         survivors.addAll(players.values());
         recalculate();
         setChanged();
-        notifyObservers(vertices);
+        notifyObservers(galaxy.makeSnapshot());
     }
 
     /**
@@ -313,11 +339,17 @@ public class GameInstance extends Observable {
         if (!isStarted() || isFinished()) {
             throw new IllegalStateException();
         }
-        this.recalculate();
+        recalculate();
+        disasters = galaxy.generateDisasters();
+        portals = galaxy.generatePortals();
         setChanged();
-        notifyObservers(vertices);
+        notifyObservers(galaxy.makeSnapshot());
         lastTurnChanges = currentChanges;
-        currentChanges = new LinkedList<Change>();
+        lastTurnDisasters = disasters;
+        lastTurnPortals = portals;
+        currentChanges = new LinkedList<>();
+        disasters = new LinkedList<>();
+        portals = new LinkedList<>();
         turnsNumber++;
         performBotsActions();
     }
@@ -389,14 +421,22 @@ public class GameInstance extends Observable {
      *         last turn.
      */
     public List<Change> getChanges() {
-        return new LinkedList<Change>(this.lastTurnChanges);
+        return new LinkedList<>(lastTurnChanges);
+    }
+
+    public List<Disaster> getDisasters() {
+        return new LinkedList<>(lastTurnDisasters);
+    }
+
+    public List<Edge> getPortals() {
+        return new LinkedList<>(lastTurnPortals);
     }
 
     /**
      * @return LinkedList of all vertices at the game field.
      */
     public List<Vertex> getVertices() {
-        return new LinkedList<Vertex>(vertices.values());
+        return new LinkedList<Vertex>(galaxy.getPlanets().values());
     }
 
     /**
@@ -410,7 +450,7 @@ public class GameInstance extends Observable {
 
     public synchronized void deleteUser(Long id, boolean ignoreAbandonment) {
         User leaver = players.get(id);
-        for (Vertex v : vertices.values()) {
+        for (Vertex v : galaxy.getPlanets().values()) {
             v.deleteUsersUnits(leaver);
         }
         players.remove(id);
@@ -513,11 +553,11 @@ public class GameInstance extends Observable {
         return result;
     }
 
-    public void setMapGenerator(MapGenerator generator) {
+    public void setGalaxy(Galaxy galaxy) {
         if (this.isStarted()) {
             throw new IllegalStateException("Game already started and generator can not be changed.");
         }
-        this.mapGenerator = generator;
+        this.galaxy = galaxy;
     }
 
     private void abandon() {
@@ -525,7 +565,7 @@ public class GameInstance extends Observable {
         for (GameAbandonedListener listener : abandonListeners) {
             listener.afterGameAbandoned(event);
         }
-        System.out.println("The game " + this.id + " successfully abandoned.");
+        log.warn("The game {} successfully abandoned.", this.id);
     }
 
     public LinkedList<UserScore> getStatistics() {

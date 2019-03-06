@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+IMAGE_TAG=dojo/hardinv-server:0.0.1
+
+REBUILD=false
+RUN=false
+STOP=false
+ALL=false
+
+cur_dir=`pwd`
+
+function go_home() {
+    cd "$cur_dir"
+}
+
+function usage() {
+    echo "./$0 [OPTIONS]"
+    echo "Where OPTIONS are:"
+    echo "  -s | --stop - Stop DB and game server"
+    echo "  -b | --build - Rebuild DB and game server"
+    echo "  -r | --run - Start DB and game server"
+    echo "  -a | --all - Rebuild and restart DB and game server"
+    echo ""
+    echo "Sources update is a manual operation"
+}
+
+function build_db_image() {
+    echo "########################################################"
+    echo "#                   Building DB                        #"
+    echo "########################################################"
+    cd "$cur_dir/setup/db" && ./build.sh
+    go_home
+}
+
+function build_server_image() {
+    echo "########################################################"
+    echo "#                 Building server                      #"
+    echo "########################################################"
+    cd $cur_dir && docker rmi -f $IMAGE_TAG && docker build -t $IMAGE_TAG -f setup/app/Dockerfile .
+    go_home
+}
+
+function build() {
+    build_db_image
+    build_server_image
+}
+
+function run() {
+    cd "$cur_dir/setup" && docker-compose up -d
+    go_home
+}
+
+function down() {
+    cd "$cur_dir/setup" && docker-compose down
+    go_home
+}
+
+while true; do
+        case "$1" in
+                -b | --build) REBUILD=true; shift ;;
+                -r | --run) RUN=true; shift ;;
+                -s | --stop) STOP=true; shift ;;
+		-a | --all) ALL=true; shift ;;
+		-h | --help) usage; exit 0 ;;
+                * ) break ;;
+        esac
+done
+
+if [[ "$STOP" = true || "$ALL" = true ]]; then
+    down
+fi
+
+if [[ "$REBUILD" = true || "$ALL" = true ]]; then
+    build
+fi
+
+if [[ "$RUN" = true || "$ALL" = true ]]; then
+    run
+fi

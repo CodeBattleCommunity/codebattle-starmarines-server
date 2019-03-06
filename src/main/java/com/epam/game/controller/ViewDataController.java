@@ -45,7 +45,7 @@ public class ViewDataController {
             return;
         }
         RequestType type = RequestType.valueOf(requestType);
-        GameInstance game = Model.getInstance().getGameById(gameId);
+        GameInstance game = Model.getInstance().getGameById(gameId, true);
         if (game == null) {
             return;
         }
@@ -56,8 +56,7 @@ public class ViewDataController {
             object = converter.generateGameMapMessage(game);
             break;
         case PLAYERS_ACTIONS:
-            object = converter.generatePlayersActionsMessage(
-                    game);
+            object = converter.generatePlayersActionsMessage(game);
             break;
         }
         // Addition of JSON object to response.

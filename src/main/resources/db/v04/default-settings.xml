@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="add_default_settings_column" author="Igor_Petrov@epam.com">
+        <addColumn tableName="SETTINGS">
+            <column name="DEF" type="varchar(1024)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="fill_default_settings" author="Igor_Petrov@epam.com">
+        <update tableName="SETTINGS">
+            <column name="DEF" value="2000" />
+            <where>ID = 'GAME_TURN_DELAY'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="bot,bot2,bot3,bot4,bot5,bot6,bot7,bot8,bot9,bot10,bot11,bot12,bot13,bot14,bot15,bot16,bot17,bot18,bot19,bot20,bot21,bot22,bot23,bot24,bot25,bot26,bot27,bot28,bot29,bot30,bot31,bot32,bot33,bot34,bot35,bot36,bot37,bot38,bot39,bot40,bot41,bot42,bot43,bot44,bot45,bot46,bot47,bot48,bot49" />
+            <where>ID = 'TRAINIG_BOT_LOGINS'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="2019-01-14T15:37:23" />
+            <where>ID = 'NEXT_GAME_TIME'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="10000" />
+            <where>ID = 'READING_TIMEOUT'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="500" />
+            <where>ID = 'ERROR_RESPONSE_DELAY'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="30" />
+            <where>ID = 'STAT_ROWS_TO_SHOW'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="true" />
+            <where>ID = 'REGISTRATION_IS_OPEN'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="2" />
+            <where>ID = 'MINIMAL_PLAYERS_NUMBER'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="50" />
+            <where>ID = 'MAXIMAL_PLAYERS_NUMBER'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="200" />
+            <where>ID = 'GAME_TURNS_LIMIT'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="0.8" />
+            <where>ID = 'LOCAL_DISASTER_DAMAGE'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="1" />
+            <where>ID = 'INTER_PLANET_DISASTER_DAMAGE'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="https://github.com/IzhevskCodeBattle/hardcoded-star-marines" />
+            <where>ID = 'GAME_SOURCES_URL'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="0.05" />
+            <where>ID = 'LOCAL_DISASTER_PROBABILITY_PER_VERTEX'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="0.05" />
+            <where>ID = 'INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="0.1" />
+            <where>ID = 'LOCAL_DISASTER_FACTOR'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="2" />
+            <where>ID = 'LOCAL_DISASTER_TTL_TICKS'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="3" />
+            <where>ID = 'INTER_PLANET_DISASTER_TTL_TICKS'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="2" />
+            <where>ID = 'PORTAL_TTL'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="1000" />
+            <where>ID = 'PLAYER_ACTIONS_LIMIT_PER_COMMAND'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="0.05" />
+            <where>ID = 'PORTAL_OPENING_FACTOR_BY_PLANETS'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="0.05" />
+            <where>ID = 'INTER_PLANET_DISASTER_FACTOR'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="https://github.com/IzhevskCodeBattle/codebattle-starmarines-clients" />
+            <where>ID = 'GAME_CLIENTS_URL'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="true" />
+            <where>ID = 'USER_BATTLE_CREATION_ENABLED'</where>
+        </update>
+        <update tableName="SETTINGS">
+            <column name="DEF" value="0.05" />
+            <where>ID = 'PORTAL_OPENING_PROBABILITY'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="disable_all_disasters_by_default" author="Igor_Petrov@epam.com">
+        <update tableName="SETTINGS" >
+            <column name="VAL" value="0.0" />
+            <where>ID in ('LOCAL_DISASTER_PROBABILITY_PER_VERTEX', 'INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE', 'PORTAL_OPENING_PROBABILITY')</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

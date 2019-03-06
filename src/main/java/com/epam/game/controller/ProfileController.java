@@ -1,6 +1,5 @@
 package com.epam.game.controller;
 
-import com.epam.game.authorization.TokenGenerator;
 import com.epam.game.constants.AttributesEnum;
 import com.epam.game.constants.ViewsEnum;
 import com.epam.game.controller.forms.ProfileForm;
@@ -12,6 +11,7 @@ import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -36,6 +36,8 @@ public class ProfileController {
     private GameDAO gameDAO;
     @Autowired
     private ProfileValidator profileValidator;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @RequestMapping(value = "/" + ViewsEnum.PROFILE + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showProfileForm(@AuthenticationPrincipal User user, ModelMap model) {
@@ -59,10 +61,10 @@ public class ProfileController {
         this.profileValidator.validate(profileForm, result);
         User user = userDAO.getUserWith(client.getId());
         if(!profileForm.getNewPassword().isEmpty() || !profileForm.getOldPassword().isEmpty()){
-            if(!profileForm.getOldPassword().equals(user.getPassword())){
+            if(!passwordEncoder.matches(profileForm.getOldPassword(),user.getPassword())) {
                 result.rejectValue("oldPassword", "oldPassword.incorrect.profileForm.oldPassword");
             } else {
-                user.setPassword(profileForm.getNewPassword());
+                user.setPassword(passwordEncoder.encode(profileForm.getNewPassword()));
             }
         }
         if (result.hasErrors()) {
@@ -84,8 +86,8 @@ public class ProfileController {
         GameInstance game = gameModel.getByUser(client.getId());
         if (game == null) {
             User user = userDAO.getUserWith(client.getId());
-            user.setToken(TokenGenerator.generate());
-            userDAO.updateUser(user);
+            String token = userDAO.updateToken(user.getId());
+            client.setToken(token);
             return "redirect:" + ViewsEnum.PROFILE + ViewsEnum.EXTENSION;
         } else {
             model.addAttribute(AttributesEnum.ERROR_TOKEN,

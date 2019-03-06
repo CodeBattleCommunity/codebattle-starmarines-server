@@ -1,13 +1,15 @@
 package com.epam.game.gameinfrastructure.requessthandling;
 
 import com.epam.game.domain.User;
+import com.epam.game.gameinfrastructure.commands.server.GalaxySnapshot;
 import com.epam.game.gamemodel.model.GameInstance;
-import com.epam.game.gamemodel.model.Vertex;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Singleton keeps the map of games and sockets of clients.
@@ -45,7 +47,7 @@ public class SocketResponseSender implements Observer {
     public void addSocketToGame(GameInstance game, PeerController pc) {
         synchronized (game) {
             if (!game.getClientsPeers().containsKey(game)) {
-                game.getClientsPeers().put(game, new HashSet<PeerController>());
+                game.getClientsPeers().put(game, ConcurrentHashMap.newKeySet());
             }
             game.getClientsPeers().get(game).add(pc);
         }
@@ -78,9 +80,8 @@ public class SocketResponseSender implements Observer {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (arg instanceof Map && o instanceof GameInstance) {
-            @SuppressWarnings("unchecked")
-            Map<Long, Vertex> vertices = (Map<Long, Vertex>) arg;
+        if (arg instanceof GalaxySnapshot && o instanceof GameInstance) {
+            GalaxySnapshot snapshot = (GalaxySnapshot) arg;
             GameInstance game = (GameInstance) o;
 
             Set<PeerController> pcs = game.getClientsPeers().get(game);
@@ -98,12 +99,30 @@ public class SocketResponseSender implements Observer {
                 }
             });
 
-            String response = commandConverter.buildResponse(vertices, errors);
 
             try {
-                sendMessageToAll(game, response);
+                if (!game.isFinished()) {
+                    String response = commandConverter.buildResponse(snapshot, errors);
+                    sendMessageToAll(game, response);
+                } else {
+                    errors.add("Game is finished!");
+                    closeFinishedGameSessions(game, commandConverter.buildErrorResponse(errors));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void closeFinishedGameSessions(GameInstance game, String message) throws IOException {
+        synchronized (game) {
+            Set<PeerController> peerControllers = new HashSet<>(game.getClientsPeers().get(game));
+            if (peerControllers != null) {
+                for (PeerController peerController : peerControllers) {
+                    WebSocketSession session = peerController.getSocket();
+                    sendMessage(session, message);
+                    session.close(CloseStatus.GOING_AWAY);
+                }
             }
         }
     }
@@ -129,7 +148,7 @@ public class SocketResponseSender implements Observer {
                     }
                 }
             }
-            game.getClientsPeers().put(game, new HashSet<>() );
+            game.getClientsPeers().put(game, ConcurrentHashMap.newKeySet());
         }
     }
 

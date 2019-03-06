@@ -26,6 +26,7 @@ public class Vertex {
     private Map<User, Integer> challengers;
     private Point coordinates;
     private String name;
+    private boolean basePlanet;
     
     private Logger log = Logger.getLogger(Vertex.class.getName());
 
@@ -72,9 +73,27 @@ public class Vertex {
      * @param vertex
      *            - vertex to connect with.
      */
-    public void interconnect(Vertex vertex) {
+    public Edge interconnect(Vertex vertex) {
         this.oneWayConnect(vertex);
         vertex.oneWayConnect(this);
+        return Edge.of(this.id, vertex.id);
+    }
+
+    public void disconnect(Vertex vertex) {
+        this.oneWayDisconnect(vertex);
+        vertex.oneWayDisconnect(this);
+    }
+
+    private void oneWayDisconnect(Vertex vertex) {
+        this.neighbors.remove(vertex.getId());
+    }
+
+    public void setBasePlanet(boolean basePlanet) {
+        this.basePlanet = basePlanet;
+    }
+
+    public boolean isBasePlanet() {
+        return basePlanet;
     }
 
     /**
@@ -109,10 +128,12 @@ public class Vertex {
      * @throws Exception is trown if unitsCount exceeds number of existing units
      * (including just regenerated units)
      */
-    public synchronized void decreaseUnits(int unitsCount) throws Exception {    
+    public synchronized void decreaseUnits(int unitsCount, boolean safe) throws Exception {
         int outcome = ownersUnitsOutcome + unitsCount;
         if (getUnitsCount() >= outcome) {
             ownersUnitsOutcome += unitsCount;
+        } else if (safe) {
+            ownersUnitsOutcome = getUnitsCount();
         } else {
             throw new Exception(String.format("Specified decreasing exceeds number of units in the planet (planet id: %d, decreasing: %d, units left: %d", this.getId(), unitsCount, this.ownersUnitsCount - this.ownersUnitsOutcome));
         }
@@ -214,7 +235,7 @@ public class Vertex {
      */
     public void deleteUsersUnits(User user) {
         challengers.remove(user);
-        if(user.equals(owner)){
+        if(user != null && user.equals(owner)){
             ownersUnitsOutcome = 0;
             ownersUnitsCount = 0;
             owner = null;

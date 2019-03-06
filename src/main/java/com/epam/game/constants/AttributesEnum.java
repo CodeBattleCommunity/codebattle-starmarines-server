@@ -15,6 +15,9 @@ public final class AttributesEnum {
     public static final String BOT_LOGIN_2 = "bot2";
     public static final String BOT_LOGIN = "bot";
     public static final String GAME = "game";
+    public static final String BATTLE_CREATION_ENABLED = "battleCreationEnabled";
+    public static final String SETTINGS = "settings";
+    public static final String USERS = "users";
     public static final String TOKEN = "token";
     public static final String ERROR_TOKEN = "errorToken";
     public static final String ERROR_SHOW_GAMES = "errorShowGames";

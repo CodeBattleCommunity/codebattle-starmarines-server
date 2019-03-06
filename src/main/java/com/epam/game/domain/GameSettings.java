@@ -22,6 +22,11 @@ public class GameSettings {
     private int minPlayers;
     private int maxPlayers;
     private boolean registrationOpened;
+    private boolean gameCreationEnabled;
     private long errorDelayMs;
     private int startRowsToShow;
+    private long playerActionsLimitPerCommand;
+    private DisasterSettings disasterSettings;
+    private PortalSettings portalSettings;
+    private DocInfo docInfo;
 }

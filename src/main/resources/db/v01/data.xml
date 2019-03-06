@@ -1,0 +1,141 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet id="init_users" author="Igor_Petrov@epam.com">
+        <sqlFile path="script/fill_users.sql"
+                 encoding="UTF-8"
+                 dbms="postgresql"
+                 splitStatements="false"
+                 stripComments="false"
+                 relativeToChangelogFile="true"/>
+    </changeSet>
+
+    <changeSet id="fill_settings" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="GAME_TURN_DELAY" />
+            <column name="VAL" value="2000" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="TRAINIG_BOT_LOGINS" />
+            <column name="VAL" value="bot,bot2,bot3,bot4,bot5,bot6,bot7,bot8,bot9,bot10,bot11,bot12,bot13,bot14,bot15,bot16,bot17,bot18,bot19,bot20,bot21,bot22,bot23,bot24,bot25,bot26,bot27,bot28,bot29,bot30,bot31,bot32,bot33,bot34,bot35,bot36,bot37,bot38,bot39,bot40,bot41,bot42,bot43,bot44,bot45,bot46,bot47,bot48,bot49" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="NEXT_GAME_TIME" />
+            <column name="VAL" value="2019-01-14T15:37:23" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="READING_TIMEOUT" />
+            <column name="VAL" value="10000" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="ERROR_RESPONSE_DELAY" />
+            <column name="VAL" value="500" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="STAT_ROWS_TO_SHOW" />
+            <column name="VAL" value="30" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="REGISTRATION_IS_OPEN" />
+            <column name="VAL" value="true" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="MINIMAL_PLAYERS_NUMBER" />
+            <column name="VAL" value="2" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="MAXIMAL_PLAYERS_NUMBER" />
+            <column name="VAL" value="50" />
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="GAME_TURNS_LIMIT" />
+            <column name="VAL" value="200" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="add_battle_creation_enabled_option" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="USER_BATTLE_CREATION_ENABLED" />
+            <column name="VAL" value="true" />
+        </insert>
+    </changeSet>
+
+    <changeSet id="add_settings_description_column" author="Igor_Petrov@epam.com">
+        <addColumn tableName="SETTINGS">
+            <column name="description" type="varchar(1024)" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="add_disaster_settings_0" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_PROBABILITY_PER_VERTEX" />
+            <column name="VAL" value="0.3" />
+            <column name="DESCRIPTION">Вероятность возникновения катастрофы на планете. В % за один игровой тик [0-1]</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE" />
+            <column name="VAL" value="0.3" />
+            <column name="DESCRIPTION">Вероятность возникновения черной дыры на ребре между двух планет. В % за один игровой тик [0-1]</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_DAMAGE" />
+            <column name="VAL" value="0.8" />
+            <column name="DESCRIPTION">Кол-во уничтожаемых катастрофой юнитов на планете. В % [0-1]</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_DAMAGE" />
+            <column name="VAL" value="1" />
+            <column name="DESCRIPTION">Кол-во уничтожаемых юнитов при попадании в черную дыру между планет. В % [0-1]</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="add_sources_links_for_docs" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="GAME_SOURCES_URL" />
+            <column name="VAL" value="https://github.com/IzhevskCodeBattle/hardcoded-star-marines" />
+            <column name="DESCRIPTION">Линк на исходники игрового сервера</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="GAME_CLIENTS_URL" />
+            <column name="VAL" value="https://github.com/IzhevskCodeBattle/hardcoded-star-marines-clients" />
+            <column name="DESCRIPTION">Линк на исходники клиентов</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="decrease_disaster_factors" author="Igor_Petrov@epam.com">
+        <update tableName="SETTINGS" >
+            <column name="VAL" value="0.05" />
+            <where>ID = 'LOCAL_DISASTER_PROBABILITY_PER_VERTEX'</where>
+        </update>
+        <update tableName="SETTINGS" >
+            <column name="VAL" value="0.05" />
+            <where>ID = 'INTER_PLANET_DISASTER_PROBABILITY_PER_EDGE'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="add_disasters_ttl" author="Igor_Petrov@epam.com">
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_FACTOR" />
+            <column name="VAL" value="0.1" />
+            <column name="description" >Максимальное кол-во локальных катастроф (в каждый момент времени) в % от общего кол-ва планет в галактике</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_FACTOR" />
+            <column name="VAL" value="0.1" />
+            <column name="description" >Максимальное кол-во межпланетных катастроф (в каждый момент времени) в % от общего кол-ва ребер графа галактики</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="LOCAL_DISASTER_TTL_TICKS" />
+            <column name="VAL" value="2" />
+            <column name="description" >Кол-во тиков, на протяжении которых сохраняется локальная планетрная катастрофа</column>
+        </insert>
+        <insert tableName="SETTINGS">
+            <column name="ID" value="INTER_PLANET_DISASTER_TTL_TICKS" />
+            <column name="VAL" value="3" />
+            <column name="description" >Кол-во тиков, на протяжении которых сохраняется межпланетарная катастрофа</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

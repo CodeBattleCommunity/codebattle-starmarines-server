@@ -1,5 +1,6 @@
 package com.epam.game.gameinfrastructure.commands;
 
+import com.epam.game.dao.GameDAO;
 import com.epam.game.domain.User;
 import com.epam.game.gameinfrastructure.UserSessionState;
 import com.epam.game.gameinfrastructure.commands.client.ClientCommand;
@@ -10,9 +11,10 @@ import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.model.action.impl.LoginAction;
 import com.epam.game.gamemodel.model.action.impl.MoveAction;
+import com.fasterxml.jackson.core.JsonParseException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
@@ -26,6 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * Created at 1/18/2019
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CommandManagerImpl implements CommandManager {
 
@@ -33,15 +36,39 @@ public class CommandManagerImpl implements CommandManager {
 
     private final Map<String, AtomicLong> activeTokens = new ConcurrentHashMap<>();
 
-    @Override
-    public void handleUserCommands(WebSocketSession session, String token, String clientPayload) {
-        ClientCommand clientCommand = commandConverter.convertToClientCommand(clientPayload);
+    private final GameDAO gameDAO;
 
-        if (CollectionUtils.isEmpty(clientCommand.getActions())) {
-            return;
+    @Override
+    public UserSessionState handleUserCommands(WebSocketSession session, String token, String clientPayload) {
+        ClientCommand clientCommand = null;
+        try {
+            clientCommand = commandConverter.convertToClientCommand(clientPayload);
+        } catch (JsonParseException parseException) {
+            log.error("Invalid command received from client with token: {}\nCommand:\n{}", token, clientPayload);
+        } catch (Exception e) {
+            log.error("Invalid command received from client with token: " + token, e);
+            return UserSessionState.invalid(CloseStatus.BAD_DATA, String.format("Invalid json command received from client '%s'." +
+                    " Please fix your client and reconnect", clientPayload));
+        }
+
+        long actionsLimitPerCommand = gameDAO.getSettings().getPlayerActionsLimitPerCommand();
+
+        if (clientCommand.getActions() != null && clientCommand.getActions().size() > actionsLimitPerCommand) {
+            return UserSessionState.invalid(CloseStatus.TOO_BIG_TO_PROCESS, String.format("Not more than %s actions " +
+                    "allowed per one command", actionsLimitPerCommand));
+        }
+
+        UserSessionState tokenValidation = validateUser(token);
+        if (!tokenValidation.isValid()) {
+            return tokenValidation;
         }
 
         GameInstance game = obtainGame(token);
+
+        UserSessionState gameStateValidation = validateGameState(game);
+        if (!gameStateValidation.isValid()) {
+            return gameStateValidation;
+        }
 
         PeerController pc = new PeerController(game.getUserByToken(token), session);
 
@@ -53,6 +80,8 @@ public class CommandManagerImpl implements CommandManager {
         if (game != null) {
             srs.addSocketToGame(game, pc);
         }
+
+        return UserSessionState.valid();
     }
 
     @Override

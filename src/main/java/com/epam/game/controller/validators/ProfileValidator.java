@@ -35,10 +35,8 @@ public class ProfileValidator implements Validator {
                 err.rejectValue("userName", "userName.outOfRange.profileForm.userName", args, null);
             }
         }
-//        if (!form.getPhone().isEmpty() && !CVUtils.isCorrectPhoneNumber(form.getPhone())) {
-//            err.rejectValue("phone", "phone.incorrect.profileForm.phone");
-//        }
-        if (!CVUtils.isGoodEmailPart(form.getEmail()) || form.getEmail().length() > MAX_EMAIL_LENGTH) {
+
+        if (!CVUtils.isEmailValid(form.getEmail()) || form.getEmail().length() > MAX_EMAIL_LENGTH) {
             err.rejectValue("email", "email.invalid.profileForm.email");
         }
         if (!form.getNewPassword().isEmpty() || !form.getOldPassword().isEmpty()) {

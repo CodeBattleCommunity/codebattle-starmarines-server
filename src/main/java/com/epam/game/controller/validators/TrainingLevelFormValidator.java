@@ -1,6 +1,6 @@
 package com.epam.game.controller.validators;
 
-import com.epam.game.constants.LevelGenerators;
+import com.epam.game.gamemodel.map.GalaxyFactory;
 import com.epam.game.controller.forms.CreateTrainingLevelForm;
 import com.epam.game.dao.GameDAO;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class TrainingLevelFormValidator implements Validator {
 //            Object[] args = { Settings.TRAINIG_BOT_LOGINS.length };
             errors.reject("botsCount", "errors.trainingLevel.botsCount.greater-than-max");
         }
-        if(LevelGenerators.getGenerator(form.getType()) == null) {
+        if(GalaxyFactory.createGenerator(form.getType(), gameDAO.getSettings()) == null) {
             errors.rejectValue("type", "errors.trainingLevel.type.incorrect");
         }
     }
