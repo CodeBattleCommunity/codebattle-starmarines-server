@@ -223,7 +223,8 @@ public class TriangleGalaxy extends Galaxy {
     @Override
     public int moveUnits(User player, Vertex from, Vertex to, int unitsCount) throws Exception {
         Edge moveEdge = Edge.of(from.getId(), to.getId());
-        if (interPlanetDisasters.containsKey(moveEdge)) {
+        Edge moveEdgedReversed = Edge.of(to.getId(), from.getId());
+        if (interPlanetDisasters.containsKey(moveEdge) || interPlanetDisasters.containsKey(moveEdgedReversed)) { // TODO: fix Edge::equals and test server
             unitsCount = interPlanetDisasters.get(moveEdge).calculateDamage(unitsCount);
         }
         from.decreaseUnits(unitsCount, false);

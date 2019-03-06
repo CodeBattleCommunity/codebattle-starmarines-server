@@ -32,6 +32,7 @@ public class UserDAO {
             user.setPassword(rs.getString("PASSWORD"));
             user.setToken(rs.getString("TOKEN"));
             user.setEmail(rs.getString("EMAIL"));
+            user.setBot(rs.getBoolean("IS_BOT"));
             user.setAuthorities(getUserAuthorities(user.getId()));
             return user;
         }
@@ -67,6 +68,10 @@ public class UserDAO {
                 addAuthorityToUser(userFromDB.getId(), authority);
             }
         }
+    }
+
+    public List<User> getRealPlayers() {
+        return jdbcTemplate.query("SELECT u.* FROM USERS u INNER JOIN AUTHORITIES a on u.id = a.user_id WHERE u.IS_BOT = false and lower(a.authority) not like '%admin%'", rowMapper);
     }
 
     public void updateUser(User user) {

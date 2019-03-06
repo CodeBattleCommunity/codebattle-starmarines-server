@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="mark_bots" author="Igor_Petrov@epam.com">
+        <addColumn tableName="USERS">
+            <column name="IS_BOT" type="boolean" defaultValueBoolean="false" />
+        </addColumn>
+
+        <update tableName="USERS">
+            <column name="IS_BOT" value="false" />
+        </update>
+
+        <update tableName="USERS">
+            <column name="IS_BOT" value="true" />
+            <where>user_name like '%bot%'</where>
+        </update>
+    </changeSet>
+    
+</databaseChangeLog>

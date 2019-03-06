@@ -3,13 +3,18 @@ package com.epam.game.controller;
 import com.epam.game.constants.AttributesEnum;
 import com.epam.game.constants.ViewsEnum;
 import com.epam.game.dao.GameDAO;
+import com.epam.game.dao.UserDAO;
 import com.epam.game.domain.FlattenSettings;
+import com.epam.game.domain.User;
+import com.epam.game.gamemodel.model.GameInstance;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 /**
  * @author Igor_Petrov@epam.com
@@ -21,9 +26,12 @@ public class AdminController {
 
     private final GameDAO gameDAO;
 
+    private final UserDAO userDAO;
+
     @GetMapping("/" + ViewsEnum.ADMIN + ViewsEnum.EXTENSION)
     public String getGameSettings(Model model) {
         populateSettingsModel(model);
+        populateUsers(model);
         return ViewsEnum.ADMIN;
     }
 
@@ -31,6 +39,7 @@ public class AdminController {
     public String applySettings(@ModelAttribute FlattenSettings settings, Model model) {
         gameDAO.applySettings(settings);
         populateSettingsModel(model);
+        populateUsers(model);
         return ViewsEnum.ADMIN;
     }
 
@@ -38,10 +47,26 @@ public class AdminController {
     public String restoreDefaults(Model model) {
         gameDAO.restoreDefaultSettings();
         populateSettingsModel(model);
+        populateUsers(model);
+        return "redirect:/" + ViewsEnum.ADMIN + ViewsEnum.EXTENSION;
+    }
+
+    @PostMapping("/" + ViewsEnum.ADMIN + "/user/cleanup")
+    public String cleanupUser(@ModelAttribute("userId") Long userId) {
+        User player = userDAO.getUserWith(userId);
+        GameInstance playerGame = com.epam.game.gamemodel.model.Model.getInstance().getByToken(player.getToken());
+        if (playerGame != null) {
+            playerGame.deleteUser(player.getId());
+        }
         return "redirect:/" + ViewsEnum.ADMIN + ViewsEnum.EXTENSION;
     }
 
     private void populateSettingsModel(Model model) {
         model.addAttribute(AttributesEnum.SETTINGS, gameDAO.getFlattenSettings());
+    }
+
+    private void populateUsers(Model model) {
+        List<User> realPlayers = userDAO.getRealPlayers();
+        model.addAttribute(AttributesEnum.USERS, realPlayers);
     }
 }
