@@ -14,7 +14,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @Slf4j
-public class DBConf {
+public class DatabaseConfig {
 
     @PostConstruct
     void init() {

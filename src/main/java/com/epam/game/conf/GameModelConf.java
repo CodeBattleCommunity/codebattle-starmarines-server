@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
  * Created at 1/15/2019
  */
 @Configuration
-@DependsOn("DBConf")
+@DependsOn("databaseConfig")
 @Slf4j
 public class GameModelConf {
 
