@@ -1,9 +1,11 @@
 package com.epam.game.conf;
 
 import liquibase.integration.spring.SpringLiquibase;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 /**
@@ -11,7 +13,13 @@ import javax.sql.DataSource;
  * Created at 1/28/2019
  */
 @Configuration
+@Slf4j
 public class DBConf {
+
+    @PostConstruct
+    void init() {
+        log.info("Running db conf");
+    }
 
     @Bean
     public SpringLiquibase liquibase(DataSource ds) {
