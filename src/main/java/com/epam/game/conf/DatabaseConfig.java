@@ -4,6 +4,8 @@ import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
@@ -14,6 +16,7 @@ import javax.sql.DataSource;
  */
 @Configuration
 @Slf4j
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class DatabaseConfig {
 
     @PostConstruct
