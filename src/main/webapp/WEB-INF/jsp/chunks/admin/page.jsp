@@ -8,6 +8,7 @@
 </form:form>
 
 <br/>
+<br/>
 
 <form:form modelAttribute="settings" action="admin" method="POST" >
     <c:forEach var="e" items="${settings.opts}">
@@ -22,3 +23,16 @@
     </c:forEach>
     <input class="button float-right" type="submit" value="<spring:message code="label.admin.settings.apply"/>" />
 </form:form>
+
+<br/>
+<br/>
+
+<form:form modelAttribute="users" action="admin/user/cleanup" method="POST" id="users_form" >
+    <input class="button float-right" type="submit" value="<spring:message code="label.admin.users.cleanup"/>" />
+</form:form>
+
+<select name="userId" form="users_form">
+    <c:forEach var="u" items="${users}" >
+        <option value="${u.id}">${u.login}</option>
+    </c:forEach>
+</select>
