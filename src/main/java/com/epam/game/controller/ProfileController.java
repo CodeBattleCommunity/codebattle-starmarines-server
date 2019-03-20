@@ -10,6 +10,7 @@ import com.epam.game.domain.User;
 import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -38,6 +39,10 @@ public class ProfileController {
     private ProfileValidator profileValidator;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    @Lazy
+    private Model gameModel;
 
     @RequestMapping(value = "/" + ViewsEnum.PROFILE + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showProfileForm(@AuthenticationPrincipal User user, ModelMap model) {
@@ -82,7 +87,6 @@ public class ProfileController {
     @RequestMapping(value = "/" + ViewsEnum.GENERATE_TOKEN
             + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String generateNewToken(@AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance game = gameModel.getByUser(client.getId());
         if (game == null) {
             User user = userDAO.getUserWith(client.getId());

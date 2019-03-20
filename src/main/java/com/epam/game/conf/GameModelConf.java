@@ -17,6 +17,6 @@ public class GameModelConf {
     @Bean
     @Lazy
     public Model modelInstance() {
-        return Model.getInstance();
+        return new Model();
     }
 }

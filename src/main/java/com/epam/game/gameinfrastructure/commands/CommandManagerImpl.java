@@ -14,6 +14,8 @@ import com.epam.game.gamemodel.model.action.impl.MoveAction;
 import com.fasterxml.jackson.core.JsonParseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
@@ -37,6 +39,10 @@ public class CommandManagerImpl implements CommandManager {
     private final Map<String, AtomicLong> activeTokens = new ConcurrentHashMap<>();
 
     private final GameDAO gameDAO;
+
+    @Autowired
+    @Lazy
+    private Model gameModel;
 
     @Override
     public UserSessionState handleUserCommands(WebSocketSession session, String token, String clientPayload) {
@@ -137,7 +143,7 @@ public class CommandManagerImpl implements CommandManager {
     }
 
     private GameInstance obtainGame(String token) {
-        return Model.getInstance().getByToken(token);
+        return gameModel.getByToken(token);
     }
 
     private String generateWinnersMessage(List<User> winners){
