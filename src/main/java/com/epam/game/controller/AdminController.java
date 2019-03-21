@@ -8,6 +8,7 @@ import com.epam.game.domain.FlattenSettings;
 import com.epam.game.domain.User;
 import com.epam.game.gamemodel.model.GameInstance;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,9 @@ public class AdminController {
     private final GameDAO gameDAO;
 
     private final UserDAO userDAO;
+
+    @Autowired
+    private com.epam.game.gamemodel.model.Model model;
 
     @GetMapping("/" + ViewsEnum.ADMIN + ViewsEnum.EXTENSION)
     public String getGameSettings(Model model) {
@@ -54,7 +58,7 @@ public class AdminController {
     @PostMapping("/" + ViewsEnum.ADMIN + "/user/cleanup")
     public String cleanupUser(@ModelAttribute("userId") Long userId) {
         User player = userDAO.getUserWith(userId);
-        GameInstance playerGame = com.epam.game.gamemodel.model.Model.getInstance().getByToken(player.getToken());
+        GameInstance playerGame = model.getByToken(player.getToken());
         if (playerGame != null) {
             playerGame.deleteUser(player.getId());
         }

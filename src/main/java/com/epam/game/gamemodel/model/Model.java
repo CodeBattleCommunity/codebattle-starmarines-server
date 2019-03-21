@@ -30,8 +30,9 @@ public class Model {
 
     private Map<Long, GameInstance> games = new ConcurrentHashMap<>();
     private Map<Long, GameInstance> gamesHistory = new ConcurrentHashMap<>();
-    private static volatile Model model = new Model();
+    @Autowired
     private GameDAO gameDAO;
+    @Autowired
     private UserDAO userDAO;
 
     @PostConstruct
@@ -54,20 +55,6 @@ public class Model {
                 .stream()
                 .map(UserScore::getUser)
                 .collect(Collectors.toMap(User::getId, Function.identity()));
-    }
-
-    @Autowired
-    public void setGameDAO(GameDAO gameDAO) {
-        this.gameDAO = gameDAO;
-    }
-
-    @Autowired
-    public void setUserDAO(UserDAO userDAO) {
-        this.userDAO = userDAO;
-    }
-
-    public static Model getInstance() {
-        return model;
     }
 
     /**

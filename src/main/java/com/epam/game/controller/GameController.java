@@ -23,6 +23,7 @@ import com.epam.game.gamemodel.model.GameInstance;
 import com.epam.game.gamemodel.model.Model;
 import com.epam.game.gamemodel.naming.impl.FileRandomNamingHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -55,9 +56,12 @@ public class GameController {
     @Autowired
     private TrainingLevelFormValidator trainingLevelFormValidator;
 
+    @Autowired
+    @Lazy
+    private Model gameModel;
+
     @RequestMapping(value = "/" + ViewsEnum.OPEN_GAMES + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showGames(ModelMap model) {
-        Model gameModel = Model.getInstance();
         if (!model.containsAttribute(AttributesEnum.TRAINING_LEVEL_FORM)) {
             model.addAttribute(AttributesEnum.TRAINING_LEVEL_FORM, new CreateTrainingLevelForm());
         }
@@ -77,7 +81,6 @@ public class GameController {
             model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, GalaxyFactory.getAvailableGenerators());
         }
 
-        Model gameModel = Model.getInstance();
         GameInstance userGame = gameModel.getByUser(client.getId());
         if (userGame != null) {
             model.addAttribute(AttributesEnum.GAME, userGame);
@@ -139,7 +142,6 @@ public class GameController {
             model.addAttribute(AttributesEnum.LEVEL_TYPES_MAP, GalaxyFactory.getAvailableGenerators());
             return showCreateGamePage(client, model);
         }
-        Model gameModel = Model.getInstance();
         Long id = generateId();
         Game game = new Game();
         game.setGameId(id);
@@ -168,7 +170,6 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.JOIN_TO_GAME + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String joinToGame(@RequestParam(value = AttributesEnum.GAME_ID, required = true) Long id, @AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance gameToJoin = gameModel.getByUser(client.getId());
         if (gameToJoin != null && gameToJoin.isFinished()) {
             gameToJoin.deleteUser(client.getId());
@@ -189,7 +190,6 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.DELETE_FROM_GAME + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String deleteFromGame(@AuthenticationPrincipal User client, @RequestParam(value = AttributesEnum.GAME_ID, required = true) Long gameId, @RequestParam(value = AttributesEnum.PLAYER_ID, required = true) Long playerId, ModelMap model, HttpServletResponse response) {
-        Model gameModel = Model.getInstance();
         boolean isAdmin = client.hasAnyRole(Authority.ROLE_ADMIN.getAuthority());
         GameInstance gameToJoin = gameModel.getByUser(playerId);
         if (gameToJoin != null && gameToJoin.getId() == gameId) {
@@ -227,7 +227,6 @@ public class GameController {
     @RequestMapping(value = "/" + ViewsEnum.GOD_MODE + ViewsEnum.EXTENSION, method = RequestMethod.POST)
     public String joinToGame(@AuthenticationPrincipal User client, @ModelAttribute MultipleLoginForm multipleLoginForm, ModelMap model) {
         String msg = "";
-        Model gameModel = Model.getInstance();
         GameInstance game = gameModel.getGameById(multipleLoginForm.getIdGame());
         String[] logins = multipleLoginForm.getLogins().replaceAll("\\s", "").split(",");
         for (String login : logins) {
@@ -251,14 +250,12 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.GAME_CONTROL + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showGameControl(@RequestParam(value = AttributesEnum.GAME_ID, required = true) Long id, ModelMap model, @AuthenticationPrincipal User client) {
-        GameInstance gameInstance = Model.getInstance().getGameById(id);
-        model.addAttribute(AttributesEnum.GAME, gameInstance);
+        model.addAttribute(AttributesEnum.GAME, gameModel.getGameById(id));
         return ViewsEnum.GAME_CONTROL;
     }
 
     @RequestMapping(value = "/" + ViewsEnum.DELETE_GAME + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String deleteGame(@RequestParam(value = AttributesEnum.GAME_ID, required = true) Long id, @AuthenticationPrincipal User client, ModelMap model, HttpServletResponse response) {
-        Model gameModel = Model.getInstance();
         if (gameModel.getGameById(id) != null) {
             Game stats = gameDAO.getById(id);
             if (!client.canControlGame(stats)) {
@@ -277,7 +274,6 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.START_GAME + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String startGame(@RequestParam(value = AttributesEnum.GAME_ID, required = true) Long id, @AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance game = gameModel.getGameById(id);
         if (game == null) {
             return "redirect:" + ViewsEnum.BATTLE + ViewsEnum.EXTENSION;
@@ -299,7 +295,6 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.CURRENT_GAME + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showCurrentGame(@AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance game = gameModel.getByUser(client.getId());
         model.addAttribute(AttributesEnum.GAME, game);
         return ViewsEnum.CURRENT_GAME;
@@ -308,7 +303,6 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.LEAVE_GAME + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String leaveGame(@RequestParam(value = AttributesEnum.GAME_ID, required = true) Long id, @AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance game = gameModel.getGameById(id);
         if (game != null) {
             game.deleteUser(client.getId());
@@ -318,7 +312,6 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.TRAINING_LEVEL + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showTrainingLevel(@AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         User user = userDAO.getUserWith(client.getId());
         GameInstance gameToStart = gameModel.getByUser(client.getId());
         if (gameToStart != null && gameToStart.isFinished()) {
@@ -355,7 +348,7 @@ public class GameController {
         gameDAO.addGame(game);
         Galaxy generator = GalaxyFactory.getDefault();
         generator.setNamingHandler(new FileRandomNamingHandler());
-        GameInstance gameToStart = Model.getInstance().createNewGame(id, GameType.TRAINING_LEVEL, ViewsEnum.TRAINING_LEVEL, user);
+        GameInstance gameToStart = gameModel.createNewGame(id, GameType.TRAINING_LEVEL, ViewsEnum.TRAINING_LEVEL, user);
         gameToStart.addPlayer(user);
         if (!GameType.TRAINING_LEVEL.equals(game.getType())) {
             return ViewsEnum.TRAINING_LEVEL;
@@ -383,7 +376,6 @@ public class GameController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/" + ViewsEnum.SHOW_GAME_TABLE + ViewsEnum.EXTENSION)
     public String getStatisticsTable(@RequestParam(required = true, value = "gameId") Long gameId, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance gameInstance = gameModel.getGameById(gameId);
         Game gameStat = gameDAO.getById(gameId);
         GameInfo gameInfo = new GameInfo();
@@ -397,7 +389,6 @@ public class GameController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/" + ViewsEnum.BROADCAST + ViewsEnum.EXTENSION)
     public String showGameForBroadcasting(@RequestParam(required = true, value = "gameId") Long gameId, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance gameInstance = gameModel.getGameById(gameId, true);
         if (gameInstance != null) {
             Game gameStats = gameDAO.getById(gameId);
@@ -412,7 +403,6 @@ public class GameController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/" + ViewsEnum.GAME_LIST_AJAX + ViewsEnum.EXTENSION)
     public String getGamesList(@AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance userGame = gameModel.getByUser(client.getId());
         if (userGame != null) {
             model.addAttribute(AttributesEnum.GAME, userGame);
@@ -446,7 +436,6 @@ public class GameController {
 
     @RequestMapping(method = RequestMethod.GET, value = "/" + ViewsEnum.CHECK_GAME_AJAX + ViewsEnum.EXTENSION)
     public String checkGameInfo(@RequestParam(required = true, value = "gameId") Long gameId, @AuthenticationPrincipal User client, ModelMap model) {
-        Model gameModel = Model.getInstance();
         GameInstance gameObject = gameModel.getGameById(gameId);
         GameInfo gameInfo = new GameInfo();
         if(gameObject != null) {

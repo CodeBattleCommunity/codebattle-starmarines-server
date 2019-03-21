@@ -8,6 +8,8 @@ import com.epam.game.gamemodel.model.Model;
 import com.epam.game.json.JSONConverter;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,6 +35,10 @@ public class ViewDataController {
 
     private final JSONConverter converter;
 
+    @Autowired
+    @Lazy
+    private Model gameModel;
+
     @RequestMapping(value = "/" + ViewsEnum.VIEW_DATA + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public void getViewData(
             @RequestParam(value = AttributesEnum.GAME_ID) String id,
@@ -45,7 +51,7 @@ public class ViewDataController {
             return;
         }
         RequestType type = RequestType.valueOf(requestType);
-        GameInstance game = Model.getInstance().getGameById(gameId, true);
+        GameInstance game = gameModel.getGameById(gameId, true);
         if (game == null) {
             return;
         }
