@@ -30,7 +30,6 @@ public class Model {
 
     private Map<Long, GameInstance> games = new ConcurrentHashMap<>();
     private Map<Long, GameInstance> gamesHistory = new ConcurrentHashMap<>();
-    private static volatile Model model = new Model();
     @Autowired
     private GameDAO gameDAO;
     @Autowired

@@ -250,7 +250,7 @@ public class GameController {
 
     @RequestMapping(value = "/" + ViewsEnum.GAME_CONTROL + ViewsEnum.EXTENSION, method = RequestMethod.GET)
     public String showGameControl(@RequestParam(value = AttributesEnum.GAME_ID, required = true) Long id, ModelMap model, @AuthenticationPrincipal User client) {
-        model.addAttribute(AttributesEnum.GAME, gameModel);
+        model.addAttribute(AttributesEnum.GAME, gameModel.getGameById(id));
         return ViewsEnum.GAME_CONTROL;
     }
 
